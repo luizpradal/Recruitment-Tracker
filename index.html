@@ -39,28 +39,34 @@
     --amber-d: #201800;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--black); color: var(--cream); font-family: 'Special Gothic Expanded One', sans-serif; font-size: 13px; min-height: 100vh; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; }
+  body { background: var(--black); color: var(--cream); font-family: 'Special Gothic Expanded One', sans-serif; font-size: 13px; display: flex; flex-direction: column; }
 
   /* ── HEADER ── */
-  .header { background: var(--dark); border-bottom: 1px solid var(--linen); padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-  .header-left { display: flex; align-items: center; gap: 12px; }
-  .logo { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; font-weight: 400; color: var(--white); letter-spacing: 2.5px; text-transform: uppercase; }
-  .logo span { color: var(--warm-grey); letter-spacing: 1px; }
-  .nav { display: flex; gap: 4px; }
-  .nav-btn { background: transparent; border: 1px solid var(--border); color: var(--warm-grey); padding: 6px 16px; border-radius: 2px; cursor: pointer; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; transition: all 0.15s; }
-  .nav-btn:hover { border-color: var(--linen); color: var(--linen); }
-  .nav-btn.active { background: var(--linen); border-color: var(--linen); color: var(--black); font-weight: 700; }
+  .header { background: var(--dark); border-bottom: 1px solid var(--linen); padding: 14px 16px 12px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .logo { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 12px; color: var(--linen); letter-spacing: 2px; text-transform: uppercase; }
+  .logo span { color: var(--warm-grey); font-size: 10px; letter-spacing: 1px; display: block; margin-top: 2px; }
+
+  /* ── SCROLL AREA ── */
+  .scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px 14px 80px; }
+
+  /* ── BOTTOM TAB BAR ── */
+  .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--dark); border-top: 1px solid var(--linen); display: flex; z-index: 100; flex-shrink: 0; }
+  .tab-btn { flex: 1; background: transparent; border: none; color: var(--warm-grey); padding: 12px 8px 14px; cursor: pointer; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: color 0.15s; }
+  .tab-btn .tab-icon { font-size: 18px; line-height: 1; }
+  .tab-btn.active { color: var(--linen); border-top: 2px solid var(--linen); margin-top: -1px; }
+  .tab-btn:hover { color: var(--linen); }
 
   /* ── VIEWS ── */
-  .view { display: none; padding: 24px; }
+  .view { display: none; }
   .view.active { display: block; }
 
   /* ── DASHBOARD ── */
-  .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
-  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 2px; padding: 16px 14px; text-align: center; border-top: 2px solid var(--linen); }
-  .stat-card .num { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 30px; font-weight: 400; color: var(--linen); line-height: 1; }
-  .stat-card .lbl { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 9px; color: var(--warm-grey); margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
+  .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 2px; padding: 14px 12px; text-align: center; border-top: 2px solid var(--linen); }
+  .stat-card .num { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 28px; font-weight: 400; color: var(--linen); line-height: 1; }
+  .stat-card .lbl { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 8px; color: var(--warm-grey); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
   .stat-card.green { border-top-color: var(--green); }
   .stat-card.green .num { color: var(--green-l); }
   .stat-card.red { border-top-color: var(--terra); }
@@ -70,35 +76,64 @@
   .stat-card.blue { border-top-color: var(--teal); }
   .stat-card.blue .num { color: var(--teal-l); }
 
-  .dash-section { background: var(--card); border: 1px solid var(--border); border-radius: 2px; margin-bottom: 14px; overflow: hidden; }
-  .dash-section-header { background: var(--charcoal); padding: 9px 16px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 9px; font-weight: 400; color: var(--linen); letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid var(--border); }
-  .dash-table { width: 100%; border-collapse: collapse; }
-  .dash-table th { background: var(--charcoal); padding: 8px 14px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 9px; color: var(--warm-grey); font-weight: 400; text-align: left; text-transform: uppercase; letter-spacing: 1px; }
-  .dash-table td { padding: 8px 14px; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--cream); }
-  .dash-table tr:last-child td { border-bottom: none; }
-  .dash-table tr:hover td { background: var(--mid); cursor: pointer; }
+  .dash-section { background: var(--card); border: 1px solid var(--border); border-radius: 2px; margin-bottom: 12px; overflow: hidden; }
+  .dash-section-header { background: var(--charcoal); padding: 8px 12px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 8px; color: var(--linen); letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid var(--border); }
 
-  /* ── PIPELINE ── */
-  .pipeline-controls { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
-  .search-input { background: var(--card); border: 1px solid var(--border); color: var(--cream); padding: 7px 12px; border-radius: 2px; font-size: 12px; font-family: 'Special Gothic Expanded One', sans-serif; width: 220px; }
+  /* Dashboard candidate rows — card style on mobile */
+  .dash-candidate-card { padding: 12px; border-bottom: 1px solid var(--border); cursor: pointer; active-opacity: 0.7; }
+  .dash-candidate-card:last-child { border-bottom: none; }
+  .dash-candidate-card:active { background: var(--mid); }
+  .dcc-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .dcc-name { font-size: 12px; font-weight: 700; color: var(--white); }
+  .dcc-rank { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 9px; color: var(--linen); }
+  .dcc-bottom { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .dcc-handle { font-size: 10px; color: var(--linen); flex: 1; }
+  .dcc-empty { font-size: 12px; color: var(--warm-grey); text-align: center; padding: 16px; }
+
+  /* ── PIPELINE CONTROLS ── */
+  .pipeline-controls { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+  .search-input { background: var(--card); border: 1px solid var(--border); color: var(--cream); padding: 10px 12px; border-radius: 2px; font-size: 13px; font-family: 'Special Gothic Expanded One', sans-serif; width: 100%; }
   .search-input:focus { outline: none; border-color: var(--linen); }
   .search-input::placeholder { color: var(--warm-grey); }
-  .filter-select { background: var(--card); border: 1px solid var(--border); color: var(--cream); padding: 7px 10px; border-radius: 2px; font-size: 12px; font-family: 'Special Gothic Expanded One', sans-serif; cursor: pointer; }
+  .controls-row { display: flex; gap: 8px; align-items: center; }
+  .filter-select { background: var(--card); border: 1px solid var(--border); color: var(--cream); padding: 8px 8px; border-radius: 2px; font-size: 11px; font-family: 'Special Gothic Expanded One', sans-serif; cursor: pointer; flex: 1; }
   .filter-select:focus { outline: none; border-color: var(--linen); }
-  .count-badge { background: var(--charcoal); border: 1px solid var(--border); color: var(--warm-grey); padding: 5px 12px; border-radius: 2px; font-size: 11px; margin-left: auto; font-family: 'Special Gothic Expanded One', sans-serif; letter-spacing: 0.5px; }
+  .count-badge { background: var(--charcoal); border: 1px solid var(--border); color: var(--warm-grey); padding: 8px 10px; border-radius: 2px; font-size: 10px; font-family: 'Special Gothic Expanded One', sans-serif; white-space: nowrap; }
 
-  .pipeline-table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 2px; overflow: hidden; border: 1px solid var(--border); }
-  .pipeline-table th { background: var(--charcoal); padding: 9px 14px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 9px; color: var(--warm-grey); font-weight: 400; text-align: left; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; border-bottom: 1px solid var(--border); }
-  .pipeline-table td { padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--cream); }
-  .pipeline-table tr:last-child td { border-bottom: none; }
-  .pipeline-table tr.data-row:hover td { background: var(--mid); cursor: pointer; }
+  /* ── CANDIDATE CARDS (pipeline) ── */
+  .candidate-card { background: var(--card); border: 1px solid var(--border); border-radius: 2px; margin-bottom: 8px; cursor: pointer; overflow: hidden; }
+  .candidate-card:active { background: var(--mid); }
 
-  .rank-badge { display: inline-block; background: var(--charcoal); color: var(--linen); font-family: 'Special Gothic Expanded One', sans-serif; font-size: 10px; font-weight: 400; padding: 2px 7px; border-radius: 2px; min-width: 28px; text-align: center; border: 1px solid var(--border); }
-  .name-cell { font-weight: 700; color: var(--white); font-size: 12px; font-family: 'Special Gothic Expanded One', sans-serif; }
-  .handle-cell { color: var(--linen); font-size: 11px; font-family: 'Special Gothic Expanded One', sans-serif; }
-  .score-cell { font-weight: 700; font-size: 12px; color: var(--linen); }
+  /* Top row — name + status */
+  .cc-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px 8px; }
+  .cc-name { font-size: 13px; font-weight: 700; color: var(--white); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-  .status-badge { display: inline-block; padding: 3px 8px; border-radius: 2px; font-size: 9px; font-weight: 400; white-space: nowrap; font-family: 'Special Gothic Expanded One', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; border: 1px solid; }
+  /* Handle row */
+  .cc-handle { font-size: 10px; color: var(--linen); padding: 0 12px 8px; }
+
+  /* Data strip — 4 equal columns with labels */
+  .cc-strip { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; border-top: 1px solid var(--border); }
+  .cc-cell { padding: 7px 0; text-align: center; border-right: 1px solid var(--border); }
+  .cc-cell:last-child { border-right: none; }
+  .cc-cell-label { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 7px; color: var(--warm-grey); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 3px; }
+  .cc-cell-value { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 13px; color: var(--linen); display: block; line-height: 1; }
+  .cc-cell-value.small { font-size: 10px; }
+  .cc-cell-value.eng-yes-v { color: var(--teal-l); }
+  .cc-cell-value.eng-no-v { color: var(--terra-l); }
+  .cc-cell-value.eng-na-v { color: var(--warm-grey); }
+  .cc-cell-value.decision-advance { color: var(--green-l); font-size: 10px; }
+  .cc-cell-value.decision-borderline { color: var(--amber); font-size: 10px; }
+  .cc-cell-value.decision-decline { color: var(--terra-l); font-size: 10px; }
+  .cc-cell-value.decision-pending { color: var(--warm-grey); font-size: 10px; }
+  .cc-exp { font-size: 10px; color: var(--warm-grey); }
+  .cc-decision { font-size: 10px; font-weight: 700; margin-left: auto; }
+  .cc-decision.advance { color: var(--green-l); }
+  .cc-decision.borderline { color: var(--amber); }
+  .cc-decision.decline { color: var(--terra-l); }
+
+  /* ── BADGES ── */
+  .rank-badge { display: inline-block; background: var(--charcoal); color: var(--linen); font-family: 'Special Gothic Expanded One', sans-serif; font-size: 9px; padding: 2px 6px; border-radius: 2px; border: 1px solid var(--border); }
+  .status-badge { display: inline-block; padding: 3px 7px; border-radius: 2px; font-size: 8px; white-space: nowrap; font-family: 'Special Gothic Expanded One', sans-serif; letter-spacing: 0.5px; text-transform: uppercase; border: 1px solid; }
   .status-not-contacted { background: var(--charcoal); color: var(--warm-grey); border-color: var(--border); }
   .status-dm-sent { background: var(--linen-d); color: var(--linen); border-color: var(--linen); }
   .status-email-sent { background: var(--teal-d); color: var(--teal-l); border-color: var(--teal); }
@@ -107,158 +142,145 @@
   .status-advanced { background: var(--green-d); color: var(--green-l); border-color: var(--green); }
   .status-declined { background: var(--terra-d); color: var(--terra-l); border-color: var(--terra); }
   .status-borderline { background: #1E1600; color: var(--amber); border-color: var(--amber); }
-
-  .band-strong { color: var(--teal-l); font-size: 9px; font-weight: 400; font-family: 'Special Gothic Expanded One', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; }
-  .band-possible { color: var(--linen); font-size: 9px; font-weight: 400; font-family: 'Special Gothic Expanded One', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; }
-
-  .action-btn { background: var(--teal); color: var(--white); border: none; padding: 4px 12px; border-radius: 2px; font-size: 10px; font-family: 'Special Gothic Expanded One', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
-  .action-btn:hover { background: var(--teal-l); color: var(--black); }
-
-  /* ── MODAL ── */
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(10,10,8,0.92); z-index: 200; overflow-y: auto; padding: 20px; }
-  .modal-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
-  .modal { background: var(--dark); border: 1px solid var(--linen); border-radius: 2px; width: 100%; max-width: 800px; padding: 0; overflow: hidden; margin: auto; }
-  .modal-header { background: var(--charcoal); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--linen); }
-  .modal-title { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 14px; font-weight: 400; color: var(--white); letter-spacing: 0.5px; }
-  .modal-subtitle { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; color: var(--linen); margin-top: 3px; letter-spacing: 0.5px; }
-  .modal-close { background: none; border: 1px solid var(--border); color: var(--warm-grey); width: 28px; height: 28px; border-radius: 2px; cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
-  .modal-close:hover { border-color: var(--terra); color: var(--terra-l); }
-  .modal-body { padding: 18px 22px; background: var(--dark); }
-
-  .modal-status-row { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
-  .modal-status-row label { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 9px; color: var(--warm-grey); text-transform: uppercase; letter-spacing: 1.5px; }
-  .status-select { background: var(--card); border: 1px solid var(--linen); color: var(--linen); padding: 5px 10px; border-radius: 2px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 12px; cursor: pointer; }
-
-  /* Q blocks */
-  .q-block { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 2px; overflow: hidden; }
-  .q-header { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--charcoal); border-bottom: 1px solid var(--border); }
-  .q-num { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 12px; font-weight: 700; color: var(--linen); min-width: 24px; }
-  .q-area { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; font-weight: 400; color: var(--cream); letter-spacing: 0.3px; flex: 1; }
-  .q-nn { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 9px; color: var(--terra-l); background: var(--terra-d); padding: 2px 7px; border-radius: 2px; border: 1px solid var(--terra); letter-spacing: 0.8px; text-transform: uppercase; }
-  .q-body { padding: 10px 12px; background: var(--card); }
-  .q-text { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; color: var(--warm-grey); font-style: italic; margin-bottom: 8px; line-height: 1.6; }
-  .q-controls { display: flex; gap: 6px; align-items: center; }
-  .pf-btn { padding: 5px 14px; border-radius: 2px; border: 1px solid; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; background: transparent; transition: all 0.12s; }
-  .pf-pass { border-color: var(--green); color: var(--green-l); }
-  .pf-pass.selected, .pf-pass:hover { background: var(--green); color: var(--white); }
-  .pf-fail { border-color: var(--terra); color: var(--terra-l); }
-  .pf-fail.selected, .pf-fail:hover { background: var(--terra); color: var(--white); }
-  .pf-none { border-color: var(--border); color: var(--warm-grey); }
-  .pf-none.selected { background: var(--mid); color: var(--cream); }
-  .q-note { flex: 1; background: var(--dark); border: 1px solid var(--border); color: var(--cream); padding: 5px 8px; border-radius: 2px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; resize: none; height: 30px; }
-  .q-note:focus { outline: none; border-color: var(--linen); }
-
-  /* Decision banner */
-  .decision-banner { padding: 12px 16px; border-radius: 2px; margin-top: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
-  .decision-banner.advance { background: var(--green-d); border: 1px solid var(--green); }
-  .decision-banner.borderline { background: var(--amber-d); border: 1px solid var(--amber); }
-  .decision-banner.decline { background: var(--terra-d); border: 1px solid var(--terra); }
-  .decision-banner.pending { background: var(--charcoal); border: 1px solid var(--border); }
-  .decision-label { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; }
-  .decision-banner.advance .decision-label { color: var(--green-l); }
-  .decision-banner.borderline .decision-label { color: var(--amber); }
-  .decision-banner.decline .decision-label { color: var(--terra-l); }
-  .decision-banner.pending .decision-label { color: var(--warm-grey); }
-  .decision-detail { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; color: var(--warm-grey); }
-
-  .modal-actions { display: flex; gap: 8px; margin-top: 14px; justify-content: flex-end; }
-  .save-btn { background: var(--teal); color: var(--white); border: none; padding: 8px 22px; border-radius: 2px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: background 0.15s; }
-  .save-btn:hover { background: var(--teal-l); color: var(--black); }
-  .cancel-btn { background: transparent; color: var(--warm-grey); border: 1px solid var(--border); padding: 8px 16px; border-radius: 2px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.15s; }
-  .cancel-btn:hover { border-color: var(--terra); color: var(--terra-l); }
-
-  /* Score strip */
-  .score-strip { display: flex; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
-  .score-pip { width: 30px; height: 30px; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 10px; font-weight: 700; border: 1px solid var(--border); }
-  .score-pip.pass { background: var(--green-d); color: var(--green-l); border-color: var(--green); }
-  .score-pip.fail { background: var(--terra-d); color: var(--terra-l); border-color: var(--terra); }
-  .score-pip.none { background: var(--charcoal); color: var(--warm-grey); }
-
-  /* English badges */
-  .eng-badge { display: inline-block; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 9px; padding: 2px 7px; border-radius: 2px; letter-spacing: 0.5px; border: 1px solid; }
+  .band-strong { color: var(--teal-l); font-size: 8px; font-family: 'Special Gothic Expanded One', sans-serif; text-transform: uppercase; }
+  .band-possible { color: var(--linen); font-size: 8px; font-family: 'Special Gothic Expanded One', sans-serif; text-transform: uppercase; }
+  .eng-badge { display: inline-block; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 8px; padding: 2px 6px; border-radius: 2px; border: 1px solid; }
   .eng-yes { background: var(--teal-d); color: var(--teal-l); border-color: var(--teal); }
   .eng-basic { background: var(--linen-d); color: var(--linen); border-color: var(--linen); }
   .eng-no { background: var(--terra-d); color: var(--terra-l); border-color: var(--terra); }
   .eng-na { background: var(--charcoal); color: var(--warm-grey); border-color: var(--border); }
 
-  /* Toast */
-  .toast { position: fixed; bottom: 20px; right: 20px; background: var(--teal-d); border: 1px solid var(--teal); color: var(--teal-l); padding: 10px 20px; border-radius: 2px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 12px; letter-spacing: 1px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
-  .toast.show { opacity: 1; }
+  /* ── MODAL — full screen sheet ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(10,10,8,0.6); z-index: 200; }
+  .modal-overlay.open { display: block; }
+  .modal { background: var(--dark); border-top: 2px solid var(--linen); border-radius: 0; width: 100%; position: fixed; bottom: 0; left: 0; right: 0; max-height: 92vh; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s ease; }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 10px auto 0; flex-shrink: 0; }
+  .modal-header { background: var(--charcoal); padding: 12px 16px; display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .modal-title { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 13px; color: var(--white); letter-spacing: 0.5px; line-height: 1.3; flex: 1; padding-right: 8px; }
+  .modal-subtitle { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 10px; color: var(--linen); margin-top: 3px; }
+  .modal-close { background: none; border: 1px solid var(--border); color: var(--warm-grey); width: 30px; height: 30px; border-radius: 2px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .modal-body { padding: 14px 16px; overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1; }
 
-  @media (max-width: 600px) {
-    .pipeline-table th:nth-child(n+4), .pipeline-table td:nth-child(n+4) { display: none; }
-  }
+  .modal-status-row { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .modal-status-row label { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 8px; color: var(--warm-grey); text-transform: uppercase; letter-spacing: 1.5px; white-space: nowrap; }
+  .status-select { background: var(--card); border: 1px solid var(--linen); color: var(--linen); padding: 8px 10px; border-radius: 2px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 12px; cursor: pointer; flex: 1; }
+
+  /* Q blocks */
+  .q-block { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 2px; overflow: hidden; }
+  .q-header { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--charcoal); border-bottom: 1px solid var(--border); }
+  .q-num { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 12px; color: var(--linen); min-width: 22px; }
+  .q-area { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 10px; color: var(--cream); flex: 1; }
+  .q-nn { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 8px; color: var(--terra-l); background: var(--terra-d); padding: 2px 6px; border-radius: 2px; border: 1px solid var(--terra); text-transform: uppercase; white-space: nowrap; }
+  .q-body { padding: 10px 12px; background: var(--card); }
+  .q-text { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 10px; color: var(--warm-grey); font-style: italic; margin-bottom: 10px; line-height: 1.5; }
+  .q-controls { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .pf-btn { padding: 9px 0; border-radius: 2px; border: 1px solid; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; background: transparent; transition: all 0.12s; flex: 1; text-align: center; min-width: 60px; }
+  .pf-pass { border-color: var(--green); color: var(--green-l); }
+  .pf-pass.selected, .pf-pass:active { background: var(--green); color: var(--white); }
+  .pf-fail { border-color: var(--terra); color: var(--terra-l); }
+  .pf-fail.selected, .pf-fail:active { background: var(--terra); color: var(--white); }
+  .pf-none { border-color: var(--border); color: var(--warm-grey); flex: 0; min-width: 44px; }
+  .pf-none.selected { background: var(--mid); color: var(--cream); }
+  .q-note { width: 100%; margin-top: 8px; background: var(--dark); border: 1px solid var(--border); color: var(--cream); padding: 8px 10px; border-radius: 2px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; resize: none; height: 36px; }
+  .q-note:focus { outline: none; border-color: var(--linen); }
+
+  /* Decision banner */
+  .decision-banner { padding: 12px 14px; border-radius: 2px; margin-top: 12px; }
+  .decision-banner.advance { background: var(--green-d); border: 1px solid var(--green); }
+  .decision-banner.borderline { background: var(--amber-d); border: 1px solid var(--amber); }
+  .decision-banner.decline { background: var(--terra-d); border: 1px solid var(--terra); }
+  .decision-banner.pending { background: var(--charcoal); border: 1px solid var(--border); }
+  .decision-label { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; display: block; margin-bottom: 3px; }
+  .decision-banner.advance .decision-label { color: var(--green-l); }
+  .decision-banner.borderline .decision-label { color: var(--amber); }
+  .decision-banner.decline .decision-label { color: var(--terra-l); }
+  .decision-banner.pending .decision-label { color: var(--warm-grey); }
+  .decision-detail { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 10px; color: var(--warm-grey); }
+
+  .modal-actions { display: flex; gap: 8px; margin-top: 14px; padding-bottom: 8px; }
+  .save-btn { background: var(--teal); color: var(--white); border: none; padding: 13px 0; border-radius: 2px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; flex: 1; }
+  .save-btn:active { background: var(--teal-l); }
+  .cancel-btn { background: transparent; color: var(--warm-grey); border: 1px solid var(--border); padding: 13px 18px; border-radius: 2px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; text-transform: uppercase; cursor: pointer; }
+
+  /* Score strip */
+  .score-strip { display: flex; gap: 4px; margin-bottom: 10px; }
+  .score-pip { flex: 1; height: 28px; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 9px; border: 1px solid var(--border); }
+  .score-pip.pass { background: var(--green-d); color: var(--green-l); border-color: var(--green); }
+  .score-pip.fail { background: var(--terra-d); color: var(--terra-l); border-color: var(--terra); }
+  .score-pip.none { background: var(--charcoal); color: var(--warm-grey); }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--teal-d); border: 1px solid var(--teal); color: var(--teal-l); padding: 10px 20px; border-radius: 2px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; letter-spacing: 1px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
+  .toast.show { opacity: 1; }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="header-left">
-    <div class="logo">NO REGRETS <span>· Recruitment Tracker</span></div>
-  </div>
-  <nav class="nav">
-    <button class="nav-btn active" onclick="showView('dashboard')">Dashboard</button>
-    <button class="nav-btn" onclick="showView('pipeline')">Pipeline</button>
-  </nav>
+  <div class="logo">NO REGRETS <span>· Recruitment Tracker</span></div>
 </div>
 
-<!-- DASHBOARD VIEW -->
-<div class="view active" id="view-dashboard">
-  <div class="dash-grid" id="dash-stats"></div>
-  <div class="dash-section">
-    <div class="dash-section-header">Recent Activity — Interviewed Candidates</div>
-    <table class="dash-table" id="dash-interviewed"></table>
+<div class="scroll-area">
+
+  <!-- DASHBOARD VIEW -->
+  <div class="view active" id="view-dashboard">
+    <div class="dash-grid" id="dash-stats"></div>
+    <div class="dash-section">
+      <div class="dash-section-header">Interviewed</div>
+      <div id="dash-interviewed"></div>
+    </div>
+    <div class="dash-section">
+      <div class="dash-section-header">Advanced to Portfolio Review</div>
+      <div id="dash-advanced"></div>
+    </div>
   </div>
-  <div class="dash-section">
-    <div class="dash-section-header">Advanced to Portfolio Review</div>
-    <table class="dash-table" id="dash-advanced"></table>
+
+  <!-- PIPELINE VIEW -->
+  <div class="view" id="view-pipeline">
+    <div class="pipeline-controls">
+      <input class="search-input" type="text" id="search-input" placeholder="Search name or handle..." oninput="renderPipeline()">
+      <div class="controls-row">
+        <select class="filter-select" id="filter-status" onchange="renderPipeline()">
+          <option value="">All statuses</option>
+          <option value="Not Contacted">Not Contacted</option>
+          <option value="DM Sent">DM Sent</option>
+          <option value="Email Sent">Email Sent</option>
+          <option value="Interview Scheduled">Interview Scheduled</option>
+          <option value="Interviewed">Interviewed</option>
+          <option value="Advanced">Advanced</option>
+          <option value="Borderline">Borderline</option>
+          <option value="Declined">Declined</option>
+        </select>
+        <select class="filter-select" id="filter-band" onchange="renderPipeline()">
+          <option value="">All bands</option>
+          <option value="STRONG">Strong</option>
+          <option value="POSSIBLE">Possible</option>
+        </select>
+        <span class="count-badge" id="count-badge">27</span>
+      </div>
+    </div>
+    <div id="pipeline-cards"></div>
   </div>
+
 </div>
 
-<!-- PIPELINE VIEW -->
-<div class="view" id="view-pipeline">
-  <div class="pipeline-controls">
-    <input class="search-input" type="text" id="search-input" placeholder="Search name or handle..." oninput="renderPipeline()">
-    <select class="filter-select" id="filter-status" onchange="renderPipeline()">
-      <option value="">All statuses</option>
-      <option value="Not Contacted">Not Contacted</option>
-      <option value="DM Sent">DM Sent</option>
-      <option value="Email Sent">Email Sent</option>
-      <option value="Interview Scheduled">Interview Scheduled</option>
-      <option value="Interviewed">Interviewed</option>
-      <option value="Advanced">Advanced</option>
-      <option value="Borderline">Borderline</option>
-      <option value="Declined">Declined</option>
-    </select>
-    <select class="filter-select" id="filter-band" onchange="renderPipeline()">
-      <option value="">All bands</option>
-      <option value="STRONG">STRONG</option>
-      <option value="POSSIBLE">POSSIBLE</option>
-    </select>
-    <span class="count-badge" id="count-badge">27 candidates</span>
-  </div>
-  <table class="pipeline-table">
-    <thead>
-      <tr>
-        <th>Rank</th>
-        <th>Name</th>
-        <th>Handle</th>
-        <th>Exp</th>
-        <th>English</th>
-        <th>Score</th>
-        <th>Band</th>
-        <th>Status</th>
-        <th>Decision</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody id="pipeline-body"></tbody>
-  </table>
-</div>
+<!-- BOTTOM TAB BAR -->
+<nav class="tab-bar">
+  <button class="tab-btn active" id="tab-dashboard" onclick="showView('dashboard', this)">
+    <span class="tab-icon">◈</span>
+    Dashboard
+  </button>
+  <button class="tab-btn" id="tab-pipeline" onclick="showView('pipeline', this)">
+    <span class="tab-icon">≡</span>
+    Pipeline
+  </button>
+</nav>
 
-<!-- INTERVIEW MODAL -->
+<!-- INTERVIEW MODAL — bottom sheet -->
 <div class="modal-overlay" id="modal" onclick="handleOverlayClick(event)">
   <div class="modal" id="modal-inner">
+    <div class="modal-handle"></div>
     <div class="modal-header">
       <div>
         <div class="modal-title" id="modal-name"></div>
@@ -268,7 +290,7 @@
     </div>
     <div class="modal-body">
       <div class="modal-status-row">
-        <label>Pipeline Status</label>
+        <label>Status</label>
         <select class="status-select" id="modal-status-select">
           <option>Not Contacted</option>
           <option>DM Sent</option>
@@ -288,13 +310,13 @@
       </div>
       <div class="modal-actions">
         <button class="cancel-btn" onclick="closeModal()">Cancel</button>
-        <button class="save-btn" onclick="saveCandidate()">Save & Close</button>
+        <button class="save-btn" onclick="saveCandidate()">Save</button>
       </div>
     </div>
   </div>
 </div>
 
-<div class="toast" id="toast">Saved</div>
+<div class="toast" id="toast">Saved ✓</div>
 
 <script>
 const QUESTIONS = [
@@ -303,7 +325,7 @@ const QUESTIONS = [
   { id:'q3', area:'Portfolio & Craft', nn:false, text:'Which tattoo design are you most proud of — and can you show me the original brief or conversation that led to it?' },
   { id:'q4', area:'Tattooing Fundamentals', nn:true,  text:'When designing for a specific body placement, what are the fundamental rules that govern your decisions — and what are the most common mistakes you see other artists make?' },
   { id:'q5', area:'AI Tools & Technology', nn:true,  text:'What AI image tools have you experimented with — and how do you use them in your creative process today?' },
-  { id:'q6', area:'Art History & Cultural Literacy', nn:false, text:'If a client asks for a tattoo "in the style of Caravaggio" or "something that feels like a Soviet propaganda poster" — what do you do with that?' },
+  { id:'q6', area:'Art History & Cultural Literacy', nn:false, text:'If a client asks for a tattoo "in the style of Rembrandt" or "something that feels like Mythological iconography" — what do you do with that?' },
   { id:'q7', area:'Sensitivity & Client Redirection', nn:false, text:'Has a client ever come to you with a brief that you felt was wrong for them — emotionally, aesthetically, or placement-wise? What did you do?' },
 ];
 
@@ -394,11 +416,12 @@ function calcDecision(id) {
 }
 
 // ── VIEWS ──────────────────────────────────────────────────────────────────
-function showView(v) {
+function showView(v, btn) {
   document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
   document.getElementById('view-' + v).classList.add('active');
-  event.target.classList.add('active');
+  if (btn) btn.classList.add('active');
+  else document.getElementById('tab-' + v).classList.add('active');
   if (v === 'dashboard') renderDashboard();
   if (v === 'pipeline') renderPipeline();
 }
@@ -417,51 +440,51 @@ function renderDashboard() {
   });
 
   document.getElementById('dash-stats').innerHTML = `
-    <div class="stat-card"><div class="num">${counts.total}</div><div class="lbl">Total Candidates</div></div>
+    <div class="stat-card"><div class="num">${counts.total}</div><div class="lbl">Total</div></div>
     <div class="stat-card amber"><div class="num">${counts.contacted}</div><div class="lbl">Contacted</div></div>
-    <div class="stat-card blue"><div class="num">${counts.scheduled}</div><div class="lbl">Interview Scheduled</div></div>
+    <div class="stat-card blue"><div class="num">${counts.scheduled}</div><div class="lbl">Scheduled</div></div>
     <div class="stat-card"><div class="num">${counts.interviewed}</div><div class="lbl">Interviewed</div></div>
     <div class="stat-card green"><div class="num">${counts.advanced}</div><div class="lbl">Advanced</div></div>
     <div class="stat-card amber"><div class="num">${counts.borderline}</div><div class="lbl">Borderline</div></div>
     <div class="stat-card red"><div class="num">${counts.declined}</div><div class="lbl">Declined</div></div>
-    <div class="stat-card"><div class="num">${counts.total - counts.contacted}</div><div class="lbl">Not Contacted</div></div>
+    <div class="stat-card"><div class="num">${counts.total - counts.contacted}</div><div class="lbl">Pending</div></div>
   `;
 
   const interviewed = CANDIDATES.filter(c => ['Interviewed','Advanced','Borderline','Declined'].includes(state[c.id]?.status));
-  const itHead = `<thead><tr><th>Rank</th><th>Name</th><th>Handle</th><th>Score</th><th>Passes</th><th>Decision</th><th>Status</th></tr></thead>`;
-  const itBody = interviewed.length === 0
-    ? `<tbody><tr><td colspan="7" style="color:var(--grey);text-align:center;padding:14px;">No candidates interviewed yet</td></tr></tbody>`
-    : `<tbody>${interviewed.map(c => {
+  document.getElementById('dash-interviewed').innerHTML = interviewed.length === 0
+    ? `<div class="dcc-empty">No candidates interviewed yet</div>`
+    : interviewed.map(c => {
         const d = calcDecision(c.id);
         const passes = QUESTIONS.filter(q => state[c.id]?.scores[q.id] === 'pass').length;
-        const dColor = d==='advance'?'var(--green-l)':d==='borderline'?'var(--amber)':d==='decline'?'var(--red)':'var(--grey)';
+        const dColor = d==='advance'?'var(--green-l)':d==='borderline'?'var(--amber)':d==='decline'?'var(--terra-l)':'var(--warm-grey)';
         const dLabel = d==='advance'?'ADVANCE':d==='borderline'?'BORDERLINE':d==='decline'?'DECLINE':'PENDING';
-        return `<tr onclick="openModal(${c.id})">
-          <td><span class="rank-badge">#${c.rank}</span></td>
-          <td style="font-weight:700;color:var(--white)">${c.name}</td>
-          <td style="color:var(--linen)">${c.handle}</td>
-          <td style="font-weight:700;color:var(--linen)">${c.score}</td>
-          <td style="color:var(--green-l)">${passes}/7</td>
-          <td style="font-weight:700;color:${dColor}">${dLabel}</td>
-          <td><span class="status-badge ${statusClass(state[c.id]?.status)}">${state[c.id]?.status}</span></td>
-        </tr>`;
-      }).join('')}</tbody>`;
-  document.getElementById('dash-interviewed').innerHTML = itHead + itBody;
+        return `<div class="dash-candidate-card" onclick="openModal(${c.id})">
+          <div class="dcc-top">
+            <span class="dcc-name">${c.name}</span>
+            <span style="font-weight:700;font-size:11px;color:${dColor}">${dLabel}</span>
+          </div>
+          <div class="dcc-bottom">
+            <span class="dcc-handle">${c.handle}</span>
+            <span style="font-size:10px;color:var(--green-l)">${passes}/7 passes</span>
+            <span class="status-badge ${statusClass(state[c.id]?.status)}">${state[c.id]?.status}</span>
+          </div>
+        </div>`;
+      }).join('');
 
   const advanced = CANDIDATES.filter(c => state[c.id]?.status === 'Advanced');
-  const adHead = `<thead><tr><th>Rank</th><th>Name</th><th>Handle</th><th>Score</th><th>Exp</th><th>English</th><th>Contact</th></tr></thead>`;
-  const adBody = advanced.length === 0
-    ? `<tbody><tr><td colspan="7" style="color:var(--grey);text-align:center;padding:14px;">No candidates advanced yet</td></tr></tbody>`
-    : `<tbody>${advanced.map(c => `<tr onclick="openModal(${c.id})">
-        <td><span class="rank-badge">#${c.rank}</span></td>
-        <td style="font-weight:700;color:var(--white)">${c.name}</td>
-        <td style="color:var(--linen)">${c.handle}</td>
-        <td style="font-weight:700;color:var(--linen)">${c.score}</td>
-        <td>${c.exp}y</td>
-        <td><span class="eng-badge ${engClass(c.english)}">${engLabel(c.english)}</span></td>
-        <td style="color:var(--grey);font-size:11px">${c.contact}</td>
-      </tr>`).join('')}</tbody>`;
-  document.getElementById('dash-advanced').innerHTML = adHead + adBody;
+  document.getElementById('dash-advanced').innerHTML = advanced.length === 0
+    ? `<div class="dcc-empty">No candidates advanced yet</div>`
+    : advanced.map(c => `<div class="dash-candidate-card" onclick="openModal(${c.id})">
+        <div class="dcc-top">
+          <span class="dcc-name">${c.name}</span>
+          <span style="font-weight:700;font-size:13px;color:var(--linen)">${c.score}</span>
+        </div>
+        <div class="dcc-bottom">
+          <span class="dcc-handle">${c.handle}</span>
+          <span class="eng-badge ${engClass(c.english)}">${engLabel(c.english)}</span>
+          <span style="font-size:10px;color:var(--warm-grey)">${c.exp}y exp</span>
+        </div>
+      </div>`).join('');
 }
 
 // ── PIPELINE ───────────────────────────────────────────────────────────────
@@ -477,29 +500,44 @@ function renderPipeline() {
     return matchSearch && matchStatus && matchBand;
   });
 
-  document.getElementById('count-badge').textContent = `${filtered.length} candidate${filtered.length!==1?'s':''}`;
+  document.getElementById('count-badge').textContent = filtered.length;
 
-  const body = document.getElementById('pipeline-body');
-  body.innerHTML = filtered.map(c => {
+  document.getElementById('pipeline-cards').innerHTML = filtered.map(c => {
     const s = state[c.id] || {};
     const status = s.status || 'Not Contacted';
     const d = calcDecision(c.id);
-    const dLabel = d==='advance'?'ADVANCE':d==='borderline'?'BORDERLINE':d==='decline'?'DECLINE':'—';
-    const dColor = d==='advance'?'var(--green-l)':d==='borderline'?'var(--amber)':d==='decline'?'var(--red)':'var(--lgrey)';
-    const passes = QUESTIONS.filter(q => s.scores?.[q.id] === 'pass').length;
     const answered = QUESTIONS.filter(q => s.scores?.[q.id] === 'pass' || s.scores?.[q.id] === 'fail').length;
-    return `<tr class="data-row" onclick="openModal(${c.id})">
-      <td><span class="rank-badge">#${c.rank}</span></td>
-      <td><div class="name-cell">${c.name}</div></td>
-      <td><div class="handle-cell">${c.handle}</div></td>
-      <td style="color:var(--warm-grey)">${c.exp}y</td>
-      <td><span class="eng-badge ${engClass(c.english)}">${engLabel(c.english)}</span></td>
-      <td class="score-cell" style="color:var(--linen)">${c.score}</td>
-      <td><span class="${c.band==='STRONG'?'band-strong':'band-possible'}">${c.band}</span></td>
-      <td><span class="status-badge ${statusClass(status)}">${status}</span></td>
-      <td style="font-weight:700;font-size:11px;color:${dColor}">${answered>0?dLabel:'—'}</td>
-      <td><button class="action-btn" onclick="event.stopPropagation();openModal(${c.id})">Open</button></td>
-    </tr>`;
+    const engV = engClass(c.english) === 'eng-yes' ? 'eng-yes-v' : engClass(c.english) === 'eng-no' ? 'eng-no-v' : 'eng-na-v';
+    const engTxt = engLabel(c.english);
+    const dLabel = d==='advance'?'ADVANCE':d==='borderline'?'BORDER':d==='decline'?'DECLINE':'—';
+    const dClass = d==='advance'?'decision-advance':d==='borderline'?'decision-borderline':d==='decline'?'decision-decline':'decision-pending';
+    const bandTxt = c.band === 'STRONG' ? 'Strong' : 'Possible';
+    const bandColor = c.band === 'STRONG' ? 'var(--teal-l)' : 'var(--linen)';
+    return `<div class="candidate-card" onclick="openModal(${c.id})">
+      <div class="cc-top">
+        <div class="cc-name">${c.name}</div>
+        <span class="status-badge ${statusClass(status)}">${status}</span>
+      </div>
+      <div class="cc-handle">${c.handle}</div>
+      <div class="cc-strip">
+        <div class="cc-cell">
+          <span class="cc-cell-label">Rank</span>
+          <span class="cc-cell-value">#${c.rank}</span>
+        </div>
+        <div class="cc-cell">
+          <span class="cc-cell-label">Score</span>
+          <span class="cc-cell-value">${c.score}</span>
+        </div>
+        <div class="cc-cell">
+          <span class="cc-cell-label">English</span>
+          <span class="cc-cell-value small ${engV}">${engTxt}</span>
+        </div>
+        <div class="cc-cell">
+          <span class="cc-cell-label">${answered > 0 ? 'Decision' : 'Band'}</span>
+          <span class="cc-cell-value small ${answered > 0 ? dClass : ''}" style="${answered === 0 ? 'color:'+bandColor : ''}">${answered > 0 ? dLabel : bandTxt}</span>
+        </div>
+      </div>
+    </div>`;
   }).join('');
 }
 
