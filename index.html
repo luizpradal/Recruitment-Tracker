@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>No Regrets Studios — Recruitment Tracker</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>No Regrets — Recruitment Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
@@ -219,7 +222,9 @@
 
 <div class="header">
   <div class="logo">NO REGRETS <span>· Recruitment Tracker</span></div>
-  <div id="recruiter-chip" style="font-family:'Special Gothic Expanded One',sans-serif;font-size:9px;color:var(--warm-grey);letter-spacing:1px;text-transform:uppercase;cursor:pointer;" onclick="changeRecruiter()" title="Tap to change name"></div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div id="recruiter-chip" style="font-family:'Special Gothic Expanded One',sans-serif;font-size:9px;color:var(--warm-grey);letter-spacing:1px;text-transform:uppercase;cursor:pointer;" onclick="changeRecruiter()" title="Tap to change name"></div>
+  </div>
 </div>
 
 <div class="scroll-area">
@@ -357,8 +362,26 @@ const CANDIDATES = [
 
 const FIREBASE_URL = 'https://nr-designer-recruitment-default-rtdb.firebaseio.com';
 
+// ── AUTO VERSION DETECTION ─────────────────────────────────────────────────
+// Reads the file's own last-modified header from the server.
+// Every time you push to GitHub, this timestamp changes automatically —
+// no manual version bumping needed.
+async function checkVersion() {
+  try {
+    const res = await fetch(window.location.href, { method: 'HEAD', cache: 'no-store' });
+    const lastModified = res.headers.get('last-modified') || res.headers.get('etag') || Date.now().toString();
+    const stored = localStorage.getItem('nr_file_version');
+    if (stored !== lastModified) {
+      localStorage.removeItem('nr_recruiter_name');
+      localStorage.setItem('nr_file_version', lastModified);
+    }
+  } catch(e) {
+    // If we can't check, don't block — just continue
+  }
+}
+
 // ── RECRUITER IDENTITY ──────────────────────────────────────────────────────
-let recruiterName = localStorage.getItem('nr_recruiter_name') || '';
+let recruiterName = '';
 
 function ensureRecruiter() {
   if (recruiterName) return Promise.resolve();
@@ -740,12 +763,15 @@ function showToast(msg) {
 }
 
 // ── INIT ───────────────────────────────────────────────────────────────────
-ensureRecruiter().then(() => {
-  const chip = document.getElementById('recruiter-chip');
-  if (chip) chip.textContent = recruiterName;
-  loadState().then(() => {
-    renderDashboard();
-    renderPipeline();
+checkVersion().then(() => {
+  recruiterName = localStorage.getItem('nr_recruiter_name') || '';
+  ensureRecruiter().then(() => {
+    const chip = document.getElementById('recruiter-chip');
+    if (chip) chip.textContent = recruiterName;
+    loadState().then(() => {
+      renderDashboard();
+      renderPipeline();
+    });
   });
 });
 </script>
