@@ -62,8 +62,8 @@
   .tab-btn:hover { color: var(--linen); }
 
   /* ── VIEWS ── */
-  .view { display: block; visibility: hidden; height: 0; overflow: hidden; pointer-events: none; }
-  .view.active { visibility: visible; height: auto; overflow: visible; pointer-events: auto; }
+  .view { display: none; }
+  .view.active { display: block; }
 
   /* ── DASHBOARD ── */
   .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
@@ -361,24 +361,15 @@ const CANDIDATES = [
 ];
 
 const FIREBASE_URL = 'https://nr-designer-recruitment-default-rtdb.firebaseio.com';
+const BUILD_TS = '2026-03-31T09:00:00Z'; // update this on each push to force re-login
 
-// ── AUTO VERSION DETECTION ─────────────────────────────────────────────────
-// Reads the file's own last-modified header from the server.
-// Every time you push to GitHub, this timestamp changes automatically —
-// no manual version bumping needed.
-async function checkVersion() {
-  try {
-    const res = await fetch(window.location.href, { method: 'HEAD', cache: 'no-store' });
-    const lastModified = res.headers.get('last-modified') || res.headers.get('etag') || Date.now().toString();
-    const stored = localStorage.getItem('nr_file_version');
-    if (stored !== lastModified) {
-      localStorage.removeItem('nr_recruiter_name');
-      localStorage.setItem('nr_file_version', lastModified);
-    }
-  } catch(e) {
-    // If we can't check, don't block — just continue
+// Clear stale recruiter name when build changes
+(function() {
+  if (localStorage.getItem('nr_build') !== BUILD_TS) {
+    localStorage.removeItem('nr_recruiter_name');
+    localStorage.setItem('nr_build', BUILD_TS);
   }
-}
+})();
 
 // ── RECRUITER IDENTITY ──────────────────────────────────────────────────────
 let recruiterName = '';
@@ -422,17 +413,28 @@ async function loadState() {
     const res = await fetch(`${FIREBASE_URL}/state.json`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    state = (data && typeof data === 'object') ? data : {};
+    if (data && typeof data === 'object') {
+      state = {};
+      // Firebase returns keys as strings — store as strings throughout
+      Object.keys(data).forEach(k => {
+        state[k] = data[k];
+      });
+    } else {
+      state = {};
+    }
   } catch(e) {
     console.warn('Firebase load failed:', e);
     state = {};
   }
-  // Fill defaults for any candidate not yet saved in Firebase
+  // Fill defaults only for candidates not yet in Firebase
   CANDIDATES.forEach(c => {
     const key = String(c.id);
-    if (!state[key]) {
+    if (!state[key] || typeof state[key] !== 'object') {
       state[key] = { status:'Not Contacted', scores:{}, notes:{}, decision:'pending', updatedBy:'', updatedAt:'' };
     }
+    // Ensure sub-objects always exist
+    if (!state[key].scores) state[key].scores = {};
+    if (!state[key].notes) state[key].notes = {};
   });
 }
 
@@ -502,9 +504,9 @@ function showView(v, btn) {
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
   document.getElementById('view-' + v).classList.add('active');
   if (btn) btn.classList.add('active');
-  else document.getElementById('tab-' + v).classList.add('active');
+  else document.getElementById('tab-' + v)?.classList.add('active');
   if (v === 'dashboard') renderDashboard();
-  if (v === 'pipeline') renderPipeline();
+  if (v === 'pipeline') renderPipeline(true);
 }
 
 // ── DASHBOARD ──────────────────────────────────────────────────────────────
@@ -769,17 +771,15 @@ function showToast(msg) {
 }
 
 // ── INIT ───────────────────────────────────────────────────────────────────
-checkVersion().then(() => {
-  recruiterName = localStorage.getItem('nr_recruiter_name') || '';
-  ensureRecruiter().then(() => {
-    const chip = document.getElementById('recruiter-chip');
-    if (chip) chip.textContent = recruiterName;
-    loadState().then(() => {
-      requestAnimationFrame(() => {
-        renderDashboard();
-        renderPipeline();
-      });
-    });
+recruiterName = localStorage.getItem('nr_recruiter_name') || '';
+ensureRecruiter().then(() => {
+  const chip = document.getElementById('recruiter-chip');
+  if (chip) chip.textContent = recruiterName;
+  loadState().then(() => {
+    renderDashboard();
+    renderPipeline();
+    // Render pipeline again after a short delay to catch any timing issues
+    setTimeout(() => renderPipeline(), 300);
   });
 });
 </script>
