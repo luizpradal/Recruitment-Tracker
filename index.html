@@ -219,6 +219,7 @@
 
 <div class="header">
   <div class="logo">NO REGRETS <span>· Recruitment Tracker</span></div>
+  <div id="recruiter-chip" style="font-family:'Special Gothic Expanded One',sans-serif;font-size:9px;color:var(--warm-grey);letter-spacing:1px;text-transform:uppercase;cursor:pointer;" onclick="changeRecruiter()" title="Tap to change name"></div>
 </div>
 
 <div class="scroll-area">
@@ -310,7 +311,7 @@
       </div>
       <div class="modal-actions">
         <button class="cancel-btn" onclick="closeModal()">Cancel</button>
-        <button class="save-btn" onclick="saveCandidate()">Save</button>
+        <button id="save-btn" class="save-btn" onclick="saveCandidate()">Save</button>
       </div>
     </div>
   </div>
@@ -354,22 +355,83 @@ const CANDIDATES = [
   {id:22,rank:22,name:'Farley Leon',        handle:'@leonn_tattoos',          exp:8,  english:'No',                 score:62.5, band:'POSSIBLE', email:'Contato.tatt@gmail.com',        contact:'+5531971551690'},
 ];
 
+const FIREBASE_URL = 'https://nr-designer-recruitment-default-rtdb.firebaseio.com';
+
+// ── RECRUITER IDENTITY ──────────────────────────────────────────────────────
+let recruiterName = localStorage.getItem('nr_recruiter_name') || '';
+
+function ensureRecruiter() {
+  if (recruiterName) return Promise.resolve();
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(10,10,8,0.95);z-index:999;display:flex;align-items:center;justify-content:center;padding:24px;';
+    overlay.innerHTML = `
+      <div style="background:#1C1C1A;border:1px solid #D4C4A8;border-radius:2px;padding:28px 24px;width:100%;max-width:340px;">
+        <div style="font-family:'Special Gothic Expanded One',sans-serif;font-size:11px;color:#D4C4A8;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">NO REGRETS</div>
+        <div style="font-family:'Special Gothic Expanded One',sans-serif;font-size:9px;color:#8C8C84;letter-spacing:1px;text-transform:uppercase;margin-bottom:20px;">Recruitment Tracker</div>
+        <div style="font-family:'Special Gothic Expanded One',sans-serif;font-size:10px;color:#EDE9E1;margin-bottom:10px;">Who are you?</div>
+        <input id="recruiter-input" type="text" placeholder="Your name..." style="width:100%;background:#232320;border:1px solid #3E3E3A;color:#EDE9E1;padding:12px;border-radius:2px;font-family:'Special Gothic Expanded One',sans-serif;font-size:13px;margin-bottom:14px;outline:none;">
+        <button id="recruiter-btn" style="width:100%;background:#1F6B75;color:#F5F2EC;border:none;padding:13px;border-radius:2px;font-family:'Special Gothic Expanded One',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">Enter Tracker</button>
+      </div>`;
+    document.body.appendChild(overlay);
+    const input = overlay.querySelector('#recruiter-input');
+    const btn = overlay.querySelector('#recruiter-btn');
+    input.focus();
+    const confirm = () => {
+      const val = input.value.trim();
+      if (!val) { input.style.borderColor='#C85A3A'; return; }
+      recruiterName = val;
+      localStorage.setItem('nr_recruiter_name', val);
+      overlay.remove();
+      resolve();
+    };
+    btn.addEventListener('click', confirm);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') confirm(); });
+  });
+}
+
 // ── STATE ──────────────────────────────────────────────────────────────────
 let state = {};
 let currentId = null;
 
 async function loadState() {
   try {
-    const r = await window.storage.get('nr_recruitment_state');
-    state = r ? JSON.parse(r.value) : {};
-  } catch(e) { state = {}; }
+    const res = await fetch(`${FIREBASE_URL}/state.json`);
+    const data = await res.json();
+    state = data || {};
+  } catch(e) {
+    console.warn('Firebase load failed, starting fresh:', e);
+    state = {};
+  }
   CANDIDATES.forEach(c => {
-    if (!state[c.id]) state[c.id] = { status:'Not Contacted', scores:{}, notes:{}, decision:'pending' };
+    if (!state[c.id]) state[c.id] = { status:'Not Contacted', scores:{}, notes:{}, decision:'pending', updatedBy:'', updatedAt:'' };
   });
 }
 
 async function saveState() {
-  try { await window.storage.set('nr_recruitment_state', JSON.stringify(state)); } catch(e) {}
+  try {
+    await fetch(`${FIREBASE_URL}/state.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state)
+    });
+  } catch(e) {
+    console.error('Firebase save failed:', e);
+    showToast('Save failed — check connection');
+  }
+}
+
+async function saveSingleCandidate(id) {
+  try {
+    await fetch(`${FIREBASE_URL}/state/${id}.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state[id])
+    });
+  } catch(e) {
+    console.error('Firebase save failed:', e);
+    showToast('Save failed — check connection');
+  }
 }
 
 // ── UTILS ──────────────────────────────────────────────────────────────────
@@ -532,6 +594,7 @@ function renderPipeline() {
           <span class="cc-cell-value small ${answered > 0 ? dClass : ''}" style="${answered === 0 ? 'color:'+bandColor : ''}">${answered > 0 ? dLabel : bandTxt}</span>
         </div>
       </div>
+      ${s.updatedBy ? `<div style="padding:5px 12px;background:var(--charcoal);font-family:'Special Gothic Expanded One',sans-serif;font-size:8px;color:var(--warm-grey);letter-spacing:0.5px;">Updated by ${s.updatedBy}${s.updatedAt ? ' · ' + new Date(s.updatedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : ''}</div>` : ''}
     </div>`;
   }).join('');
 }
@@ -543,7 +606,8 @@ function openModal(id) {
   const s = state[id] || {};
 
   document.getElementById('modal-name').textContent = `${c.name} — ${c.handle}`;
-  document.getElementById('modal-sub').textContent = `Rank #${c.rank} · Score ${c.score} · ${c.band} · ${c.exp} years · ${c.email}`;
+  const updatedInfo = s.updatedBy ? ` · Updated by ${s.updatedBy} ${s.updatedAt ? '· ' + new Date(s.updatedAt).toLocaleDateString('en-GB', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : ''}` : '';
+  document.getElementById('modal-sub').textContent = `Rank #${c.rank} · Score ${c.score} · ${c.band} · ${c.exp} years${updatedInfo}`;
   document.getElementById('modal-status-select').value = s.status || 'Not Contacted';
 
   // Score strip
@@ -644,24 +708,39 @@ async function saveCandidate() {
     if (noteEl) state[currentId].notes[q.id] = noteEl.value;
   });
   state[currentId].decision = calcDecision(currentId);
-  await saveState();
+  state[currentId].updatedBy = recruiterName;
+  state[currentId].updatedAt = new Date().toISOString();
+  document.getElementById('save-btn').textContent = 'Saving…';
+  await saveSingleCandidate(currentId);
   closeModal();
   renderPipeline();
   renderDashboard();
-  showToast('Saved ✓');
+  showToast(`Saved by ${recruiterName} ✓`);
+}
+
+function changeRecruiter() {
+  localStorage.removeItem('nr_recruiter_name');
+  recruiterName = '';
+  ensureRecruiter().then(() => {
+    document.getElementById('recruiter-chip').textContent = recruiterName;
+  });
 }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
+  setTimeout(() => t.classList.remove('show'), 2500);
 }
 
 // ── INIT ───────────────────────────────────────────────────────────────────
-loadState().then(() => {
-  renderDashboard();
-  renderPipeline();
+ensureRecruiter().then(() => {
+  const chip = document.getElementById('recruiter-chip');
+  if (chip) chip.textContent = recruiterName;
+  loadState().then(() => {
+    renderDashboard();
+    renderPipeline();
+  });
 });
 </script>
 </body>
