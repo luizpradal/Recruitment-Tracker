@@ -62,8 +62,8 @@
   .tab-btn:hover { color: var(--linen); }
 
   /* ── VIEWS ── */
-  .view { display: none; }
-  .view.active { display: block; }
+  .view { display: block; visibility: hidden; height: 0; overflow: hidden; pointer-events: none; }
+  .view.active { visibility: visible; height: auto; overflow: visible; pointer-events: auto; }
 
   /* ── DASHBOARD ── */
   .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
@@ -569,19 +569,25 @@ function renderDashboard() {
 }
 
 // ── PIPELINE ───────────────────────────────────────────────────────────────
-function renderPipeline() {
-  const search = document.getElementById('search-input').value.toLowerCase();
-  const filterStatus = document.getElementById('filter-status').value;
-  const filterBand = document.getElementById('filter-band').value;
+function renderPipeline(resetFilter) {
+  if (resetFilter) {
+    document.getElementById('filter-status').value = '';
+    document.getElementById('filter-band').value = '';
+    document.getElementById('search-input').value = '';
+  }
+  const search = (document.getElementById('search-input')?.value || '').toLowerCase();
+  const filterStatus = document.getElementById('filter-status')?.value || '';
+  const filterBand = document.getElementById('filter-band')?.value || '';
 
-  let filtered = CANDIDATES.filter(c => {
+  const filtered = CANDIDATES.filter(c => {
     const matchSearch = !search || c.name.toLowerCase().includes(search) || c.handle.toLowerCase().includes(search);
     const matchStatus = !filterStatus || (state[String(c.id)]?.status || 'Not Contacted') === filterStatus;
     const matchBand = !filterBand || c.band === filterBand;
     return matchSearch && matchStatus && matchBand;
   });
 
-  document.getElementById('count-badge').textContent = filtered.length;
+  const badge = document.getElementById('count-badge');
+  if (badge) badge.textContent = filtered.length;
 
   document.getElementById('pipeline-cards').innerHTML = filtered.map(c => {
     const s = state[String(c.id)] || {};
@@ -739,7 +745,7 @@ async function saveCandidate() {
   const ok = await saveSingleCandidate(currentId);
   if (ok) {
     closeModal();
-    renderPipeline();
+    renderPipeline(true);
     renderDashboard();
     showToast(`Saved by ${recruiterName} ✓`);
   } else {
@@ -769,8 +775,10 @@ checkVersion().then(() => {
     const chip = document.getElementById('recruiter-chip');
     if (chip) chip.textContent = recruiterName;
     loadState().then(() => {
-      renderDashboard();
-      renderPipeline();
+      requestAnimationFrame(() => {
+        renderDashboard();
+        renderPipeline();
+      });
     });
   });
 });
