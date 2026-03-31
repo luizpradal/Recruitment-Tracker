@@ -397,40 +397,45 @@ let currentId = null;
 async function loadState() {
   try {
     const res = await fetch(`${FIREBASE_URL}/state.json`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    state = data || {};
+    if (data && typeof data === 'object') {
+      // Firebase returns numeric keys as strings — normalise to numbers
+      state = {};
+      Object.keys(data).forEach(k => { state[parseInt(k)] = data[k]; });
+    } else {
+      state = {};
+    }
   } catch(e) {
-    console.warn('Firebase load failed, starting fresh:', e);
+    console.warn('Firebase load failed:', e);
     state = {};
   }
+  // Only fill defaults for candidates not yet in Firebase
   CANDIDATES.forEach(c => {
-    if (!state[c.id]) state[c.id] = { status:'Not Contacted', scores:{}, notes:{}, decision:'pending', updatedBy:'', updatedAt:'' };
+    if (!state[c.id]) {
+      state[c.id] = { status:'Not Contacted', scores:{}, notes:{}, decision:'pending', updatedBy:'', updatedAt:'' };
+    }
   });
-}
-
-async function saveState() {
-  try {
-    await fetch(`${FIREBASE_URL}/state.json`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(state)
-    });
-  } catch(e) {
-    console.error('Firebase save failed:', e);
-    showToast('Save failed — check connection');
-  }
 }
 
 async function saveSingleCandidate(id) {
   try {
-    await fetch(`${FIREBASE_URL}/state/${id}.json`, {
+    const res = await fetch(`${FIREBASE_URL}/state/${id}.json`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(state[id])
     });
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('Firebase save error:', err);
+      showToast('Save failed — check Firebase rules');
+      return false;
+    }
+    return true;
   } catch(e) {
     console.error('Firebase save failed:', e);
     showToast('Save failed — check connection');
+    return false;
   }
 }
 
@@ -710,12 +715,17 @@ async function saveCandidate() {
   state[currentId].decision = calcDecision(currentId);
   state[currentId].updatedBy = recruiterName;
   state[currentId].updatedAt = new Date().toISOString();
-  document.getElementById('save-btn').textContent = 'Saving…';
-  await saveSingleCandidate(currentId);
-  closeModal();
-  renderPipeline();
-  renderDashboard();
-  showToast(`Saved by ${recruiterName} ✓`);
+  const btn = document.getElementById('save-btn');
+  if (btn) btn.textContent = 'Saving…';
+  const ok = await saveSingleCandidate(currentId);
+  if (ok) {
+    closeModal();
+    renderPipeline();
+    renderDashboard();
+    showToast(`Saved by ${recruiterName} ✓`);
+  } else {
+    if (btn) btn.textContent = 'Save';
+  }
 }
 
 function changeRecruiter() {
