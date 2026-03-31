@@ -399,31 +399,27 @@ async function loadState() {
     const res = await fetch(`${FIREBASE_URL}/state.json`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    if (data && typeof data === 'object') {
-      // Firebase returns numeric keys as strings — normalise to numbers
-      state = {};
-      Object.keys(data).forEach(k => { state[parseInt(k)] = data[k]; });
-    } else {
-      state = {};
-    }
+    state = (data && typeof data === 'object') ? data : {};
   } catch(e) {
     console.warn('Firebase load failed:', e);
     state = {};
   }
-  // Only fill defaults for candidates not yet in Firebase
+  // Fill defaults for any candidate not yet saved in Firebase
   CANDIDATES.forEach(c => {
-    if (!state[c.id]) {
-      state[c.id] = { status:'Not Contacted', scores:{}, notes:{}, decision:'pending', updatedBy:'', updatedAt:'' };
+    const key = String(c.id);
+    if (!state[key]) {
+      state[key] = { status:'Not Contacted', scores:{}, notes:{}, decision:'pending', updatedBy:'', updatedAt:'' };
     }
   });
 }
 
 async function saveSingleCandidate(id) {
+  const key = String(id);
   try {
-    const res = await fetch(`${FIREBASE_URL}/state/${id}.json`, {
+    const res = await fetch(`${FIREBASE_URL}/state/${key}.json`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(state[id])
+      body: JSON.stringify(state[key])
     });
     if (!res.ok) {
       const err = await res.text();
@@ -464,7 +460,7 @@ function statusClass(s) {
 }
 
 function calcDecision(id) {
-  const s = state[id];
+  const s = state[String(id)];
   if (!s) return 'pending';
   const scores = s.scores;
   const answered = QUESTIONS.filter(q => scores[q.id] === 'pass' || scores[q.id] === 'fail');
@@ -492,7 +488,7 @@ function showView(v, btn) {
 function renderDashboard() {
   const counts = { total:22, contacted:0, interviewed:0, advanced:0, declined:0, borderline:0, scheduled:0 };
   CANDIDATES.forEach(c => {
-    const s = state[c.id]?.status || 'Not Contacted';
+    const s = state[String(c.id)]?.status || 'Not Contacted';
     if (s !== 'Not Contacted') counts.contacted++;
     if (s === 'Interviewed') counts.interviewed++;
     if (s === 'Advanced') counts.advanced++;
@@ -512,12 +508,12 @@ function renderDashboard() {
     <div class="stat-card"><div class="num">${counts.total - counts.contacted}</div><div class="lbl">Pending</div></div>
   `;
 
-  const interviewed = CANDIDATES.filter(c => ['Interviewed','Advanced','Borderline','Declined'].includes(state[c.id]?.status));
+  const interviewed = CANDIDATES.filter(c => ['Interviewed','Advanced','Borderline','Declined'].includes(state[String(c.id)]?.status));
   document.getElementById('dash-interviewed').innerHTML = interviewed.length === 0
     ? `<div class="dcc-empty">No candidates interviewed yet</div>`
     : interviewed.map(c => {
         const d = calcDecision(c.id);
-        const passes = QUESTIONS.filter(q => state[c.id]?.scores[q.id] === 'pass').length;
+        const passes = QUESTIONS.filter(q => state[String(c.id)]?.scores?.[q.id] === 'pass').length;
         const dColor = d==='advance'?'var(--green-l)':d==='borderline'?'var(--amber)':d==='decline'?'var(--terra-l)':'var(--warm-grey)';
         const dLabel = d==='advance'?'ADVANCE':d==='borderline'?'BORDERLINE':d==='decline'?'DECLINE':'PENDING';
         return `<div class="dash-candidate-card" onclick="openModal(${c.id})">
@@ -528,12 +524,12 @@ function renderDashboard() {
           <div class="dcc-bottom">
             <span class="dcc-handle">${c.handle}</span>
             <span style="font-size:10px;color:var(--green-l)">${passes}/7 passes</span>
-            <span class="status-badge ${statusClass(state[c.id]?.status)}">${state[c.id]?.status}</span>
+            <span class="status-badge ${statusClass(state[String(c.id)]?.status)}">${state[String(c.id)]?.status}</span>
           </div>
         </div>`;
       }).join('');
 
-  const advanced = CANDIDATES.filter(c => state[c.id]?.status === 'Advanced');
+  const advanced = CANDIDATES.filter(c => state[String(c.id)]?.status === 'Advanced');
   document.getElementById('dash-advanced').innerHTML = advanced.length === 0
     ? `<div class="dcc-empty">No candidates advanced yet</div>`
     : advanced.map(c => `<div class="dash-candidate-card" onclick="openModal(${c.id})">
@@ -557,7 +553,7 @@ function renderPipeline() {
 
   let filtered = CANDIDATES.filter(c => {
     const matchSearch = !search || c.name.toLowerCase().includes(search) || c.handle.toLowerCase().includes(search);
-    const matchStatus = !filterStatus || (state[c.id]?.status || 'Not Contacted') === filterStatus;
+    const matchStatus = !filterStatus || (state[String(c.id)]?.status || 'Not Contacted') === filterStatus;
     const matchBand = !filterBand || c.band === filterBand;
     return matchSearch && matchStatus && matchBand;
   });
@@ -565,7 +561,7 @@ function renderPipeline() {
   document.getElementById('count-badge').textContent = filtered.length;
 
   document.getElementById('pipeline-cards').innerHTML = filtered.map(c => {
-    const s = state[c.id] || {};
+    const s = state[String(c.id)] || {};
     const status = s.status || 'Not Contacted';
     const d = calcDecision(c.id);
     const answered = QUESTIONS.filter(q => s.scores?.[q.id] === 'pass' || s.scores?.[q.id] === 'fail').length;
@@ -608,7 +604,7 @@ function renderPipeline() {
 function openModal(id) {
   currentId = id;
   const c = CANDIDATES.find(x => x.id === id);
-  const s = state[id] || {};
+  const s = state[String(id)] || {};
 
   document.getElementById('modal-name').textContent = `${c.name} — ${c.handle}`;
   const updatedInfo = s.updatedBy ? ` · Updated by ${s.updatedBy} ${s.updatedAt ? '· ' + new Date(s.updatedAt).toLocaleDateString('en-GB', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : ''}` : '';
@@ -648,8 +644,8 @@ function openModal(id) {
 }
 
 function setScore(qid, val) {
-  if (!state[currentId]) state[currentId] = { status:'Not Contacted', scores:{}, notes:{}, decision:'pending' };
-  state[currentId].scores[qid] = val;
+  if (!state[String(currentId)]) state[String(currentId)] = { status:'Not Contacted', scores:{}, notes:{}, decision:'pending' };
+  state[String(currentId)].scores[qid] = val;
 
   // Update buttons
   const block = document.querySelector(`[id="note-${qid}"]`).closest('.q-block');
@@ -660,7 +656,7 @@ function setScore(qid, val) {
 
   // Update score strip
   document.getElementById('score-strip').innerHTML = QUESTIONS.map(q => {
-    const v = state[currentId]?.scores?.[q.id] || 'none';
+    const v = state[String(currentId)]?.scores?.[q.id] || 'none';
     return `<div class="score-pip ${v}" title="Q${q.id.replace('q','')} ${q.area}">${q.id.replace('q','Q')}</div>`;
   }).join('');
 
@@ -669,7 +665,7 @@ function setScore(qid, val) {
 
 function updateDecisionBanner() {
   const d = calcDecision(currentId);
-  const s = state[currentId] || {};
+  const s = state[String(currentId)] || {};
   const passes = QUESTIONS.filter(q => s.scores?.[q.id] === 'pass').length;
   const fails = QUESTIONS.filter(q => s.scores?.[q.id] === 'fail').length;
   const nnFails = QUESTIONS.filter(q => q.nn && s.scores?.[q.id] === 'fail').length;
@@ -706,15 +702,15 @@ function handleOverlayClick(e) {
 
 async function saveCandidate() {
   if (!currentId) return;
-  if (!state[currentId]) state[currentId] = { status:'Not Contacted', scores:{}, notes:{} };
-  state[currentId].status = document.getElementById('modal-status-select').value;
+  if (!state[String(currentId)]) state[String(currentId)] = { status:'Not Contacted', scores:{}, notes:{} };
+  state[String(currentId)].status = document.getElementById('modal-status-select').value;
   QUESTIONS.forEach(q => {
     const noteEl = document.getElementById('note-' + q.id);
-    if (noteEl) state[currentId].notes[q.id] = noteEl.value;
+    if (noteEl) state[String(currentId)].notes[q.id] = noteEl.value;
   });
-  state[currentId].decision = calcDecision(currentId);
-  state[currentId].updatedBy = recruiterName;
-  state[currentId].updatedAt = new Date().toISOString();
+  state[String(currentId)].decision = calcDecision(currentId);
+  state[String(currentId)].updatedBy = recruiterName;
+  state[String(currentId)].updatedAt = new Date().toISOString();
   const btn = document.getElementById('save-btn');
   if (btn) btn.textContent = 'Saving…';
   const ok = await saveSingleCandidate(currentId);
