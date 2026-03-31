@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>No Regrets Studios — Recruitment Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* No Regrets Brand Palette — Neutrals */
+    --black: #0F0F0F;          /* deep black — primary bg */
+    --dark: #1C1C1A;           /* near-black surface */
+    --charcoal: #2C2C2A;       /* charcoal dark grey */
+    --mid: #3A3A37;            /* mid surface */
+    --card: #232320;           /* card bg */
+    --border: #3E3E3A;         /* border */
+    --cool-grey: #C8CBCB;      /* cool light grey */
+    --warm-grey: #8C8C84;      /* warm muted grey — body text */
+    --linen: #D4C4A8;          /* warm sand / linen — primary accent */
+    --linen-d: #2A2518;        /* linen dark bg tint */
+    --cream: #EDE9E1;          /* off-white / cream — headings on dark */
+    --white: #F5F2EC;          /* near-white */
+    /* Accent colours */
+    --teal: #1F6B75;           /* teal — primary interactive accent */
+    --teal-l: #4FA8B4;         /* teal light — text on dark */
+    --teal-d: #0D2E32;         /* teal dark bg tint */
+    --terra: #C85A3A;          /* terracotta — warning / fail */
+    --terra-l: #E8876A;        /* terracotta light */
+    --terra-d: #2E1510;        /* terracotta dark bg tint */
+    /* Semantic — kept from original for pass/fail logic */
+    --green: #4A8A5A;          /* advance green */
+    --green-d: #0E1A12;
+    --green-l: #7AB888;
+    --red: var(--terra);       /* map red → terracotta */
+    --red-d: var(--terra-d);
+    --amber: #B89040;          /* warm amber — borderline */
+    --amber-d: #201800;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--black); color: var(--cream); font-family: 'Special Gothic Expanded One', sans-serif; font-size: 13px; min-height: 100vh; }
+
+  /* ── HEADER ── */
+  .header { background: var(--dark); border-bottom: 1px solid var(--linen); padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; font-weight: 400; color: var(--white); letter-spacing: 2.5px; text-transform: uppercase; }
+  .logo span { color: var(--warm-grey); letter-spacing: 1px; }
+  .nav { display: flex; gap: 4px; }
+  .nav-btn { background: transparent; border: 1px solid var(--border); color: var(--warm-grey); padding: 6px 16px; border-radius: 2px; cursor: pointer; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; transition: all 0.15s; }
+  .nav-btn:hover { border-color: var(--linen); color: var(--linen); }
+  .nav-btn.active { background: var(--linen); border-color: var(--linen); color: var(--black); font-weight: 700; }
+
+  /* ── VIEWS ── */
+  .view { display: none; padding: 24px; }
+  .view.active { display: block; }
+
+  /* ── DASHBOARD ── */
+  .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 2px; padding: 16px 14px; text-align: center; border-top: 2px solid var(--linen); }
+  .stat-card .num { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 30px; font-weight: 400; color: var(--linen); line-height: 1; }
+  .stat-card .lbl { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 9px; color: var(--warm-grey); margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
+  .stat-card.green { border-top-color: var(--green); }
+  .stat-card.green .num { color: var(--green-l); }
+  .stat-card.red { border-top-color: var(--terra); }
+  .stat-card.red .num { color: var(--terra-l); }
+  .stat-card.amber { border-top-color: var(--amber); }
+  .stat-card.amber .num { color: var(--amber); }
+  .stat-card.blue { border-top-color: var(--teal); }
+  .stat-card.blue .num { color: var(--teal-l); }
+
+  .dash-section { background: var(--card); border: 1px solid var(--border); border-radius: 2px; margin-bottom: 14px; overflow: hidden; }
+  .dash-section-header { background: var(--charcoal); padding: 9px 16px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 9px; font-weight: 400; color: var(--linen); letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  .dash-table { width: 100%; border-collapse: collapse; }
+  .dash-table th { background: var(--charcoal); padding: 8px 14px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 9px; color: var(--warm-grey); font-weight: 400; text-align: left; text-transform: uppercase; letter-spacing: 1px; }
+  .dash-table td { padding: 8px 14px; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--cream); }
+  .dash-table tr:last-child td { border-bottom: none; }
+  .dash-table tr:hover td { background: var(--mid); cursor: pointer; }
+
+  /* ── PIPELINE ── */
+  .pipeline-controls { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+  .search-input { background: var(--card); border: 1px solid var(--border); color: var(--cream); padding: 7px 12px; border-radius: 2px; font-size: 12px; font-family: 'Special Gothic Expanded One', sans-serif; width: 220px; }
+  .search-input:focus { outline: none; border-color: var(--linen); }
+  .search-input::placeholder { color: var(--warm-grey); }
+  .filter-select { background: var(--card); border: 1px solid var(--border); color: var(--cream); padding: 7px 10px; border-radius: 2px; font-size: 12px; font-family: 'Special Gothic Expanded One', sans-serif; cursor: pointer; }
+  .filter-select:focus { outline: none; border-color: var(--linen); }
+  .count-badge { background: var(--charcoal); border: 1px solid var(--border); color: var(--warm-grey); padding: 5px 12px; border-radius: 2px; font-size: 11px; margin-left: auto; font-family: 'Special Gothic Expanded One', sans-serif; letter-spacing: 0.5px; }
+
+  .pipeline-table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 2px; overflow: hidden; border: 1px solid var(--border); }
+  .pipeline-table th { background: var(--charcoal); padding: 9px 14px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 9px; color: var(--warm-grey); font-weight: 400; text-align: left; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; border-bottom: 1px solid var(--border); }
+  .pipeline-table td { padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--cream); }
+  .pipeline-table tr:last-child td { border-bottom: none; }
+  .pipeline-table tr.data-row:hover td { background: var(--mid); cursor: pointer; }
+
+  .rank-badge { display: inline-block; background: var(--charcoal); color: var(--linen); font-family: 'Special Gothic Expanded One', sans-serif; font-size: 10px; font-weight: 400; padding: 2px 7px; border-radius: 2px; min-width: 28px; text-align: center; border: 1px solid var(--border); }
+  .name-cell { font-weight: 700; color: var(--white); font-size: 12px; font-family: 'Special Gothic Expanded One', sans-serif; }
+  .handle-cell { color: var(--linen); font-size: 11px; font-family: 'Special Gothic Expanded One', sans-serif; }
+  .score-cell { font-weight: 700; font-size: 12px; color: var(--linen); }
+
+  .status-badge { display: inline-block; padding: 3px 8px; border-radius: 2px; font-size: 9px; font-weight: 400; white-space: nowrap; font-family: 'Special Gothic Expanded One', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; border: 1px solid; }
+  .status-not-contacted { background: var(--charcoal); color: var(--warm-grey); border-color: var(--border); }
+  .status-dm-sent { background: var(--linen-d); color: var(--linen); border-color: var(--linen); }
+  .status-email-sent { background: var(--teal-d); color: var(--teal-l); border-color: var(--teal); }
+  .status-interview-scheduled { background: #1A2020; color: #7ABBB8; border-color: var(--teal); }
+  .status-interviewed { background: var(--amber-d); color: var(--amber); border-color: var(--amber); }
+  .status-advanced { background: var(--green-d); color: var(--green-l); border-color: var(--green); }
+  .status-declined { background: var(--terra-d); color: var(--terra-l); border-color: var(--terra); }
+  .status-borderline { background: #1E1600; color: var(--amber); border-color: var(--amber); }
+
+  .band-strong { color: var(--teal-l); font-size: 9px; font-weight: 400; font-family: 'Special Gothic Expanded One', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; }
+  .band-possible { color: var(--linen); font-size: 9px; font-weight: 400; font-family: 'Special Gothic Expanded One', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; }
+
+  .action-btn { background: var(--teal); color: var(--white); border: none; padding: 4px 12px; border-radius: 2px; font-size: 10px; font-family: 'Special Gothic Expanded One', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+  .action-btn:hover { background: var(--teal-l); color: var(--black); }
+
+  /* ── MODAL ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(10,10,8,0.92); z-index: 200; overflow-y: auto; padding: 20px; }
+  .modal-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+  .modal { background: var(--dark); border: 1px solid var(--linen); border-radius: 2px; width: 100%; max-width: 800px; padding: 0; overflow: hidden; margin: auto; }
+  .modal-header { background: var(--charcoal); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--linen); }
+  .modal-title { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 14px; font-weight: 400; color: var(--white); letter-spacing: 0.5px; }
+  .modal-subtitle { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; color: var(--linen); margin-top: 3px; letter-spacing: 0.5px; }
+  .modal-close { background: none; border: 1px solid var(--border); color: var(--warm-grey); width: 28px; height: 28px; border-radius: 2px; cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+  .modal-close:hover { border-color: var(--terra); color: var(--terra-l); }
+  .modal-body { padding: 18px 22px; background: var(--dark); }
+
+  .modal-status-row { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .modal-status-row label { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 9px; color: var(--warm-grey); text-transform: uppercase; letter-spacing: 1.5px; }
+  .status-select { background: var(--card); border: 1px solid var(--linen); color: var(--linen); padding: 5px 10px; border-radius: 2px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 12px; cursor: pointer; }
+
+  /* Q blocks */
+  .q-block { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 2px; overflow: hidden; }
+  .q-header { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--charcoal); border-bottom: 1px solid var(--border); }
+  .q-num { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 12px; font-weight: 700; color: var(--linen); min-width: 24px; }
+  .q-area { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; font-weight: 400; color: var(--cream); letter-spacing: 0.3px; flex: 1; }
+  .q-nn { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 9px; color: var(--terra-l); background: var(--terra-d); padding: 2px 7px; border-radius: 2px; border: 1px solid var(--terra); letter-spacing: 0.8px; text-transform: uppercase; }
+  .q-body { padding: 10px 12px; background: var(--card); }
+  .q-text { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; color: var(--warm-grey); font-style: italic; margin-bottom: 8px; line-height: 1.6; }
+  .q-controls { display: flex; gap: 6px; align-items: center; }
+  .pf-btn { padding: 5px 14px; border-radius: 2px; border: 1px solid; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; background: transparent; transition: all 0.12s; }
+  .pf-pass { border-color: var(--green); color: var(--green-l); }
+  .pf-pass.selected, .pf-pass:hover { background: var(--green); color: var(--white); }
+  .pf-fail { border-color: var(--terra); color: var(--terra-l); }
+  .pf-fail.selected, .pf-fail:hover { background: var(--terra); color: var(--white); }
+  .pf-none { border-color: var(--border); color: var(--warm-grey); }
+  .pf-none.selected { background: var(--mid); color: var(--cream); }
+  .q-note { flex: 1; background: var(--dark); border: 1px solid var(--border); color: var(--cream); padding: 5px 8px; border-radius: 2px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; resize: none; height: 30px; }
+  .q-note:focus { outline: none; border-color: var(--linen); }
+
+  /* Decision banner */
+  .decision-banner { padding: 12px 16px; border-radius: 2px; margin-top: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
+  .decision-banner.advance { background: var(--green-d); border: 1px solid var(--green); }
+  .decision-banner.borderline { background: var(--amber-d); border: 1px solid var(--amber); }
+  .decision-banner.decline { background: var(--terra-d); border: 1px solid var(--terra); }
+  .decision-banner.pending { background: var(--charcoal); border: 1px solid var(--border); }
+  .decision-label { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; }
+  .decision-banner.advance .decision-label { color: var(--green-l); }
+  .decision-banner.borderline .decision-label { color: var(--amber); }
+  .decision-banner.decline .decision-label { color: var(--terra-l); }
+  .decision-banner.pending .decision-label { color: var(--warm-grey); }
+  .decision-detail { font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; color: var(--warm-grey); }
+
+  .modal-actions { display: flex; gap: 8px; margin-top: 14px; justify-content: flex-end; }
+  .save-btn { background: var(--teal); color: var(--white); border: none; padding: 8px 22px; border-radius: 2px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: background 0.15s; }
+  .save-btn:hover { background: var(--teal-l); color: var(--black); }
+  .cancel-btn { background: transparent; color: var(--warm-grey); border: 1px solid var(--border); padding: 8px 16px; border-radius: 2px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.15s; }
+  .cancel-btn:hover { border-color: var(--terra); color: var(--terra-l); }
+
+  /* Score strip */
+  .score-strip { display: flex; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
+  .score-pip { width: 30px; height: 30px; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 10px; font-weight: 700; border: 1px solid var(--border); }
+  .score-pip.pass { background: var(--green-d); color: var(--green-l); border-color: var(--green); }
+  .score-pip.fail { background: var(--terra-d); color: var(--terra-l); border-color: var(--terra); }
+  .score-pip.none { background: var(--charcoal); color: var(--warm-grey); }
+
+  /* English badges */
+  .eng-badge { display: inline-block; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 9px; padding: 2px 7px; border-radius: 2px; letter-spacing: 0.5px; border: 1px solid; }
+  .eng-yes { background: var(--teal-d); color: var(--teal-l); border-color: var(--teal); }
+  .eng-basic { background: var(--linen-d); color: var(--linen); border-color: var(--linen); }
+  .eng-no { background: var(--terra-d); color: var(--terra-l); border-color: var(--terra); }
+  .eng-na { background: var(--charcoal); color: var(--warm-grey); border-color: var(--border); }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 20px; right: 20px; background: var(--teal-d); border: 1px solid var(--teal); color: var(--teal-l); padding: 10px 20px; border-radius: 2px; font-family: 'Special Gothic Expanded One', sans-serif; font-size: 12px; letter-spacing: 1px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+
+  @media (max-width: 600px) {
+    .pipeline-table th:nth-child(n+4), .pipeline-table td:nth-child(n+4) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo">NO REGRETS <span>· Recruitment Tracker</span></div>
+  </div>
+  <nav class="nav">
+    <button class="nav-btn active" onclick="showView('dashboard')">Dashboard</button>
+    <button class="nav-btn" onclick="showView('pipeline')">Pipeline</button>
+  </nav>
+</div>
+
+<!-- DASHBOARD VIEW -->
+<div class="view active" id="view-dashboard">
+  <div class="dash-grid" id="dash-stats"></div>
+  <div class="dash-section">
+    <div class="dash-section-header">Recent Activity — Interviewed Candidates</div>
+    <table class="dash-table" id="dash-interviewed"></table>
+  </div>
+  <div class="dash-section">
+    <div class="dash-section-header">Advanced to Portfolio Review</div>
+    <table class="dash-table" id="dash-advanced"></table>
+  </div>
+</div>
+
+<!-- PIPELINE VIEW -->
+<div class="view" id="view-pipeline">
+  <div class="pipeline-controls">
+    <input class="search-input" type="text" id="search-input" placeholder="Search name or handle..." oninput="renderPipeline()">
+    <select class="filter-select" id="filter-status" onchange="renderPipeline()">
+      <option value="">All statuses</option>
+      <option value="Not Contacted">Not Contacted</option>
+      <option value="DM Sent">DM Sent</option>
+      <option value="Email Sent">Email Sent</option>
+      <option value="Interview Scheduled">Interview Scheduled</option>
+      <option value="Interviewed">Interviewed</option>
+      <option value="Advanced">Advanced</option>
+      <option value="Borderline">Borderline</option>
+      <option value="Declined">Declined</option>
+    </select>
+    <select class="filter-select" id="filter-band" onchange="renderPipeline()">
+      <option value="">All bands</option>
+      <option value="STRONG">STRONG</option>
+      <option value="POSSIBLE">POSSIBLE</option>
+    </select>
+    <span class="count-badge" id="count-badge">27 candidates</span>
+  </div>
+  <table class="pipeline-table">
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Name</th>
+        <th>Handle</th>
+        <th>Exp</th>
+        <th>English</th>
+        <th>Score</th>
+        <th>Band</th>
+        <th>Status</th>
+        <th>Decision</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="pipeline-body"></tbody>
+  </table>
+</div>
+
+<!-- INTERVIEW MODAL -->
+<div class="modal-overlay" id="modal" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal-inner">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-name"></div>
+        <div class="modal-subtitle" id="modal-sub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-status-row">
+        <label>Pipeline Status</label>
+        <select class="status-select" id="modal-status-select">
+          <option>Not Contacted</option>
+          <option>DM Sent</option>
+          <option>Email Sent</option>
+          <option>Interview Scheduled</option>
+          <option>Interviewed</option>
+          <option>Advanced</option>
+          <option>Borderline</option>
+          <option>Declined</option>
+        </select>
+      </div>
+      <div class="score-strip" id="score-strip"></div>
+      <div id="q-blocks"></div>
+      <div class="decision-banner pending" id="decision-banner">
+        <span class="decision-label" id="decision-label">Score questions to calculate decision</span>
+        <span class="decision-detail" id="decision-detail"></span>
+      </div>
+      <div class="modal-actions">
+        <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+        <button class="save-btn" onclick="saveCandidate()">Save & Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Saved</div>
+
+<script>
+const QUESTIONS = [
+  { id:'q1', area:'Warm-Up · Sensitivity', nn:false, text:'What is the most meaningful tattoo you have ever done — and why did it matter to you?' },
+  { id:'q2', area:'Creative Autonomy', nn:true,  text:'Walk me through a time a client gave you almost nothing to work with. How did you turn a vague brief into a finished piece?' },
+  { id:'q3', area:'Portfolio & Craft', nn:false, text:'Which tattoo design are you most proud of — and can you show me the original brief or conversation that led to it?' },
+  { id:'q4', area:'Tattooing Fundamentals', nn:true,  text:'When designing for a specific body placement, what are the fundamental rules that govern your decisions — and what are the most common mistakes you see other artists make?' },
+  { id:'q5', area:'AI Tools & Technology', nn:true,  text:'What AI image tools have you experimented with — and how do you use them in your creative process today?' },
+  { id:'q6', area:'Art History & Cultural Literacy', nn:false, text:'If a client asks for a tattoo "in the style of Caravaggio" or "something that feels like a Soviet propaganda poster" — what do you do with that?' },
+  { id:'q7', area:'Sensitivity & Client Redirection', nn:false, text:'Has a client ever come to you with a brief that you felt was wrong for them — emotionally, aesthetically, or placement-wise? What did you do?' },
+];
+
+const CANDIDATES = [
+  {id:1, rank:1, name:'Rodrigo Batista',    handle:'@BatisTattoo',           exp:21, english:'Yes — intermediate', score:84.5, band:'STRONG',   email:'rodrigobatistattoo@gmail.com',  contact:'+5521983724355'},
+  {id:2, rank:2, name:'Jean Cruz',          handle:'@jeancruztattoo',         exp:13, english:'Yes, I speak',       score:80.0, band:'STRONG',   email:'jeancz1993@gmail.com',          contact:'+5549920020039'},
+  {id:3, rank:3, name:'Tulio de Paula',     handle:'@tuliodepaulaa',          exp:15, english:'Not stated',         score:79.5, band:'STRONG',   email:'tuliodepaulaa@icloud.com',      contact:'+5531986965493'},
+  {id:4, rank:4, name:'Renan Stramosk',     handle:'@renan.r.t',              exp:9,  english:'Not fluent but good',score:77.0, band:'STRONG',   email:'s.renan2@gmail.com',            contact:'+5548988343162'},
+  {id:5, rank:5, name:'Oton Safraide',      handle:'@otontattoo',             exp:15, english:'So-so / basic',      score:77.0, band:'STRONG',   email:'otons35@gmail.com',             contact:'+5567992342321'},
+  {id:6, rank:6, name:'Troper Art',         handle:'@troperart',              exp:15, english:'A little, studying', score:77.0, band:'STRONG',   email:'troperart.jr@gmail.com',        contact:'+5511987472051'},
+  {id:7, rank:7, name:'Caxo',               handle:'@caxo.ink',               exp:10, english:'Yes',                score:75.5, band:'STRONG',   email:'caxotattoo@gmail.com',          contact:'+5511913369503'},
+  {id:8, rank:8, name:'Matheus Carvalho',   handle:'@matheuscarvtattoo',      exp:10, english:'Yes, I do',          score:74.5, band:'STRONG',   email:'Mc13129@gmail.com',             contact:'+5535991775194'},
+  {id:9, rank:9, name:'Victor Castro',      handle:'@victorcastro.tattoo',    exp:9,  english:'Yes',                score:74.0, band:'STRONG',   email:'victor.fuel@gmail.com',         contact:'+5531991632352'},
+  {id:10,rank:10,name:'Fry Granado',        handle:'@fry_granado',            exp:10, english:'Not stated (US #)',  score:72.5, band:'STRONG',   email:'frayik@gmail.com',              contact:'+1(786)482-3687'},
+  {id:11,rank:11,name:'Thiago Machado',     handle:'@thiagokoutt',            exp:12, english:'Very basic',         score:72.0, band:'STRONG',   email:'Thiagokoutt@gmail.com',         contact:'+5521999968082'},
+  {id:12,rank:12,name:'Cassius',            handle:'@cassius_tatuador',       exp:11, english:'Not stated',         score:72.0, band:'STRONG',   email:'Cassiuslive79@gmail.com',       contact:'+5511982948444'},
+  {id:13,rank:13,name:'Lucas Lopes',        handle:'@lucasdatattoo',          exp:10, english:'Not stated',         score:70.5, band:'STRONG',   email:'lopes.alves.sp@hotmail.com',   contact:'+5524993074330'},
+  {id:14,rank:14,name:'Nick Lacerda',       handle:'@nick.tattoo',            exp:10, english:'Not stated',         score:70.5, band:'STRONG',   email:'Nicklacerda2607@gmail.com',     contact:'+5511948530302'},
+  {id:15,rank:15,name:'Lucas Carneiro',     handle:'@lucascarneirotattoo',    exp:11, english:'Basic',              score:69.5, band:'POSSIBLE', email:'lucassethjf123@gmail.com',      contact:'+5532991293006'},
+  {id:16,rank:16,name:'Matheus Scalon',     handle:'@matheusscalontattoo',    exp:11, english:'Needs to improve',   score:69.5, band:'POSSIBLE', email:'matheusscalon87@gmail.com',     contact:'+5511971754428'},
+  {id:17,rank:17,name:'Felipe Matias',      handle:'@felpmatiastattoo',       exp:7,  english:'Yes',                score:69.5, band:'POSSIBLE', email:'fmatiassoares@gmail.com',       contact:'+5512981607519'},
+  {id:18,rank:18,name:'Vitor Miranda',      handle:'@v.tattooink7',           exp:9,  english:'Not stated',         score:69.0, band:'POSSIBLE', email:'V.tattooink7@gmail.com',        contact:'+5511983801992'},
+  {id:19,rank:19,name:'Édipo Renner',       handle:'@ediporenner',            exp:9,  english:'Not stated',         score:69.0, band:'POSSIBLE', email:'ediporenner@hotmail.com',       contact:'+5554996217793'},
+  {id:20,rank:20,name:'Samuel Ramalho',     handle:'@samuelramalhotattoos',   exp:10, english:'A little',           score:68.5, band:'POSSIBLE', email:'samuelhramalho@gmail.com',      contact:'+5531989543687'},
+  {id:21,rank:21,name:'Elyab Freire',       handle:'@elyabfreiretattoo',      exp:8,  english:'Speaks enough',      score:68.5, band:'POSSIBLE', email:'elyab.freire.tattoo@gmail.com', contact:'+5584987243027'},
+  {id:22,rank:22,name:'Gustavo Carlos',     handle:'@gustavocarlostattoo',    exp:10, english:'Basic',              score:68.5, band:'POSSIBLE', email:'gustavosk8rcrazy@hotmail.com',  contact:'+5531993100707'},
+  {id:23,rank:23,name:'Julio Rocha',        handle:'@julio_rochatattoo',      exp:7,  english:'Not stated',         score:66.5, band:'POSSIBLE', email:'julioferreirarocha21@gmail.com',contact:'+5531982870536'},
+  {id:24,rank:24,name:'Yram Antillano',     handle:'@noxfera_art',            exp:8,  english:'Partial (implied)',  score:66.5, band:'POSSIBLE', email:'Noxfera.art@gmail.com',         contact:'+593964035145'},
+  {id:25,rank:25,name:'Vinicius Mora',      handle:'@viniciusmoratattoos',    exp:7,  english:'Not stated',         score:66.5, band:'POSSIBLE', email:'viniciusmora7x@gmail.com',      contact:'+5512997487340'},
+  {id:26,rank:26,name:'Farley Leon',        handle:'@leonn_tattoos',          exp:8,  english:'No',                 score:62.5, band:'POSSIBLE', email:'Contato.tatt@gmail.com',        contact:'+5531971551690'},
+  {id:27,rank:27,name:'Lucas Souza',        handle:'@lucassouza.tattoo',      exp:7,  english:'No',                 score:62.5, band:'POSSIBLE', email:'Desouzalucas989@gmail.com',     contact:'+5535992043930'},
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let state = {};
+let currentId = null;
+
+async function loadState() {
+  try {
+    const r = await window.storage.get('nr_recruitment_state');
+    state = r ? JSON.parse(r.value) : {};
+  } catch(e) { state = {}; }
+  CANDIDATES.forEach(c => {
+    if (!state[c.id]) state[c.id] = { status:'Not Contacted', scores:{}, notes:{}, decision:'pending' };
+  });
+}
+
+async function saveState() {
+  try { await window.storage.set('nr_recruitment_state', JSON.stringify(state)); } catch(e) {}
+}
+
+// ── UTILS ──────────────────────────────────────────────────────────────────
+function engLabel(e) {
+  const l = e.toLowerCase();
+  if (l === 'no') return 'No';
+  if (l.includes('not stated') || l.includes('us #')) return 'Not stated';
+  return 'Yes';
+}
+
+function engClass(e) {
+  const l = e.toLowerCase();
+  if (l === 'no') return 'eng-no';
+  if (l.includes('not stated') || l.includes('us #')) return 'eng-na';
+  return 'eng-yes';
+}
+
+function statusClass(s) {
+  const map = {
+    'Not Contacted':'not-contacted','DM Sent':'dm-sent','Email Sent':'email-sent',
+    'Interview Scheduled':'interview-scheduled','Interviewed':'interviewed',
+    'Advanced':'advanced','Declined':'declined','Borderline':'borderline'
+  };
+  return 'status-' + (map[s] || 'not-contacted');
+}
+
+function calcDecision(id) {
+  const s = state[id];
+  if (!s) return 'pending';
+  const scores = s.scores;
+  const answered = QUESTIONS.filter(q => scores[q.id] === 'pass' || scores[q.id] === 'fail');
+  if (answered.length === 0) return 'pending';
+  const passes = QUESTIONS.filter(q => scores[q.id] === 'pass').length;
+  const nnFail = QUESTIONS.filter(q => q.nn && scores[q.id] === 'fail').length;
+  if (nnFail > 0) return 'decline';
+  if (passes >= 5) return 'advance';
+  if (passes === 4) return 'borderline';
+  return 'decline';
+}
+
+// ── VIEWS ──────────────────────────────────────────────────────────────────
+function showView(v) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  event.target.classList.add('active');
+  if (v === 'dashboard') renderDashboard();
+  if (v === 'pipeline') renderPipeline();
+}
+
+// ── DASHBOARD ──────────────────────────────────────────────────────────────
+function renderDashboard() {
+  const counts = { total:27, contacted:0, interviewed:0, advanced:0, declined:0, borderline:0, scheduled:0 };
+  CANDIDATES.forEach(c => {
+    const s = state[c.id]?.status || 'Not Contacted';
+    if (s !== 'Not Contacted') counts.contacted++;
+    if (s === 'Interviewed') counts.interviewed++;
+    if (s === 'Advanced') counts.advanced++;
+    if (s === 'Declined') counts.declined++;
+    if (s === 'Borderline') counts.borderline++;
+    if (s === 'Interview Scheduled') counts.scheduled++;
+  });
+
+  document.getElementById('dash-stats').innerHTML = `
+    <div class="stat-card"><div class="num">${counts.total}</div><div class="lbl">Total Candidates</div></div>
+    <div class="stat-card amber"><div class="num">${counts.contacted}</div><div class="lbl">Contacted</div></div>
+    <div class="stat-card blue"><div class="num">${counts.scheduled}</div><div class="lbl">Interview Scheduled</div></div>
+    <div class="stat-card"><div class="num">${counts.interviewed}</div><div class="lbl">Interviewed</div></div>
+    <div class="stat-card green"><div class="num">${counts.advanced}</div><div class="lbl">Advanced</div></div>
+    <div class="stat-card amber"><div class="num">${counts.borderline}</div><div class="lbl">Borderline</div></div>
+    <div class="stat-card red"><div class="num">${counts.declined}</div><div class="lbl">Declined</div></div>
+    <div class="stat-card"><div class="num">${counts.total - counts.contacted}</div><div class="lbl">Not Contacted</div></div>
+  `;
+
+  const interviewed = CANDIDATES.filter(c => ['Interviewed','Advanced','Borderline','Declined'].includes(state[c.id]?.status));
+  const itHead = `<thead><tr><th>Rank</th><th>Name</th><th>Handle</th><th>Score</th><th>Passes</th><th>Decision</th><th>Status</th></tr></thead>`;
+  const itBody = interviewed.length === 0
+    ? `<tbody><tr><td colspan="7" style="color:var(--grey);text-align:center;padding:14px;">No candidates interviewed yet</td></tr></tbody>`
+    : `<tbody>${interviewed.map(c => {
+        const d = calcDecision(c.id);
+        const passes = QUESTIONS.filter(q => state[c.id]?.scores[q.id] === 'pass').length;
+        const dColor = d==='advance'?'var(--green-l)':d==='borderline'?'var(--amber)':d==='decline'?'var(--red)':'var(--grey)';
+        const dLabel = d==='advance'?'ADVANCE':d==='borderline'?'BORDERLINE':d==='decline'?'DECLINE':'PENDING';
+        return `<tr onclick="openModal(${c.id})">
+          <td><span class="rank-badge">#${c.rank}</span></td>
+          <td style="font-weight:700;color:var(--white)">${c.name}</td>
+          <td style="color:var(--linen)">${c.handle}</td>
+          <td style="font-weight:700;color:var(--linen)">${c.score}</td>
+          <td style="color:var(--green-l)">${passes}/7</td>
+          <td style="font-weight:700;color:${dColor}">${dLabel}</td>
+          <td><span class="status-badge ${statusClass(state[c.id]?.status)}">${state[c.id]?.status}</span></td>
+        </tr>`;
+      }).join('')}</tbody>`;
+  document.getElementById('dash-interviewed').innerHTML = itHead + itBody;
+
+  const advanced = CANDIDATES.filter(c => state[c.id]?.status === 'Advanced');
+  const adHead = `<thead><tr><th>Rank</th><th>Name</th><th>Handle</th><th>Score</th><th>Exp</th><th>English</th><th>Contact</th></tr></thead>`;
+  const adBody = advanced.length === 0
+    ? `<tbody><tr><td colspan="7" style="color:var(--grey);text-align:center;padding:14px;">No candidates advanced yet</td></tr></tbody>`
+    : `<tbody>${advanced.map(c => `<tr onclick="openModal(${c.id})">
+        <td><span class="rank-badge">#${c.rank}</span></td>
+        <td style="font-weight:700;color:var(--white)">${c.name}</td>
+        <td style="color:var(--linen)">${c.handle}</td>
+        <td style="font-weight:700;color:var(--linen)">${c.score}</td>
+        <td>${c.exp}y</td>
+        <td><span class="eng-badge ${engClass(c.english)}">${engLabel(c.english)}</span></td>
+        <td style="color:var(--grey);font-size:11px">${c.contact}</td>
+      </tr>`).join('')}</tbody>`;
+  document.getElementById('dash-advanced').innerHTML = adHead + adBody;
+}
+
+// ── PIPELINE ───────────────────────────────────────────────────────────────
+function renderPipeline() {
+  const search = document.getElementById('search-input').value.toLowerCase();
+  const filterStatus = document.getElementById('filter-status').value;
+  const filterBand = document.getElementById('filter-band').value;
+
+  let filtered = CANDIDATES.filter(c => {
+    const matchSearch = !search || c.name.toLowerCase().includes(search) || c.handle.toLowerCase().includes(search);
+    const matchStatus = !filterStatus || (state[c.id]?.status || 'Not Contacted') === filterStatus;
+    const matchBand = !filterBand || c.band === filterBand;
+    return matchSearch && matchStatus && matchBand;
+  });
+
+  document.getElementById('count-badge').textContent = `${filtered.length} candidate${filtered.length!==1?'s':''}`;
+
+  const body = document.getElementById('pipeline-body');
+  body.innerHTML = filtered.map(c => {
+    const s = state[c.id] || {};
+    const status = s.status || 'Not Contacted';
+    const d = calcDecision(c.id);
+    const dLabel = d==='advance'?'ADVANCE':d==='borderline'?'BORDERLINE':d==='decline'?'DECLINE':'—';
+    const dColor = d==='advance'?'var(--green-l)':d==='borderline'?'var(--amber)':d==='decline'?'var(--red)':'var(--lgrey)';
+    const passes = QUESTIONS.filter(q => s.scores?.[q.id] === 'pass').length;
+    const answered = QUESTIONS.filter(q => s.scores?.[q.id] === 'pass' || s.scores?.[q.id] === 'fail').length;
+    return `<tr class="data-row" onclick="openModal(${c.id})">
+      <td><span class="rank-badge">#${c.rank}</span></td>
+      <td><div class="name-cell">${c.name}</div></td>
+      <td><div class="handle-cell">${c.handle}</div></td>
+      <td style="color:var(--warm-grey)">${c.exp}y</td>
+      <td><span class="eng-badge ${engClass(c.english)}">${engLabel(c.english)}</span></td>
+      <td class="score-cell" style="color:var(--linen)">${c.score}</td>
+      <td><span class="${c.band==='STRONG'?'band-strong':'band-possible'}">${c.band}</span></td>
+      <td><span class="status-badge ${statusClass(status)}">${status}</span></td>
+      <td style="font-weight:700;font-size:11px;color:${dColor}">${answered>0?dLabel:'—'}</td>
+      <td><button class="action-btn" onclick="event.stopPropagation();openModal(${c.id})">Open</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── MODAL ──────────────────────────────────────────────────────────────────
+function openModal(id) {
+  currentId = id;
+  const c = CANDIDATES.find(x => x.id === id);
+  const s = state[id] || {};
+
+  document.getElementById('modal-name').textContent = `${c.name} — ${c.handle}`;
+  document.getElementById('modal-sub').textContent = `Rank #${c.rank} · Score ${c.score} · ${c.band} · ${c.exp} years · ${c.email}`;
+  document.getElementById('modal-status-select').value = s.status || 'Not Contacted';
+
+  // Score strip
+  document.getElementById('score-strip').innerHTML = QUESTIONS.map(q => {
+    const v = s.scores?.[q.id] || 'none';
+    return `<div class="score-pip ${v}" title="Q${q.id.replace('q','')} ${q.area}">${q.id.replace('q','Q')}</div>`;
+  }).join('');
+
+  // Q blocks
+  document.getElementById('q-blocks').innerHTML = QUESTIONS.map(q => {
+    const val = s.scores?.[q.id] || 'none';
+    const note = s.notes?.[q.id] || '';
+    return `<div class="q-block">
+      <div class="q-header">
+        <span class="q-num">Q${q.id.replace('q','')}</span>
+        <span class="q-area">${q.area}</span>
+        ${q.nn ? '<span class="q-nn">NON-NEGOTIABLE</span>' : ''}
+      </div>
+      <div class="q-body">
+        <div class="q-text">"${q.text}"</div>
+        <div class="q-controls">
+          <button class="pf-btn pf-pass ${val==='pass'?'selected':''}" onclick="setScore('${q.id}','pass')">PASS</button>
+          <button class="pf-btn pf-fail ${val==='fail'?'selected':''}" onclick="setScore('${q.id}','fail')">FAIL</button>
+          <button class="pf-btn pf-none ${val==='none'?'selected':''}" onclick="setScore('${q.id}','none')">—</button>
+          <textarea class="q-note" id="note-${q.id}" placeholder="Notes…">${note}</textarea>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  updateDecisionBanner();
+  document.getElementById('modal').classList.add('open');
+}
+
+function setScore(qid, val) {
+  if (!state[currentId]) state[currentId] = { status:'Not Contacted', scores:{}, notes:{}, decision:'pending' };
+  state[currentId].scores[qid] = val;
+
+  // Update buttons
+  const block = document.querySelector(`[id="note-${qid}"]`).closest('.q-block');
+  block.querySelectorAll('.pf-btn').forEach(b => b.classList.remove('selected'));
+  if (val === 'pass') block.querySelectorAll('.pf-btn')[0].classList.add('selected');
+  if (val === 'fail') block.querySelectorAll('.pf-btn')[1].classList.add('selected');
+  if (val === 'none') block.querySelectorAll('.pf-btn')[2].classList.add('selected');
+
+  // Update score strip
+  document.getElementById('score-strip').innerHTML = QUESTIONS.map(q => {
+    const v = state[currentId]?.scores?.[q.id] || 'none';
+    return `<div class="score-pip ${v}" title="Q${q.id.replace('q','')} ${q.area}">${q.id.replace('q','Q')}</div>`;
+  }).join('');
+
+  updateDecisionBanner();
+}
+
+function updateDecisionBanner() {
+  const d = calcDecision(currentId);
+  const s = state[currentId] || {};
+  const passes = QUESTIONS.filter(q => s.scores?.[q.id] === 'pass').length;
+  const fails = QUESTIONS.filter(q => s.scores?.[q.id] === 'fail').length;
+  const nnFails = QUESTIONS.filter(q => q.nn && s.scores?.[q.id] === 'fail').length;
+  const answered = passes + fails;
+
+  const banner = document.getElementById('decision-banner');
+  const label = document.getElementById('decision-label');
+  const detail = document.getElementById('decision-detail');
+
+  banner.className = 'decision-banner ' + (d === 'pending' ? 'pending' : d);
+  if (d === 'pending') {
+    label.textContent = answered === 0 ? 'Score questions to calculate decision' : `${answered}/7 answered — keep going`;
+    detail.textContent = '';
+  } else if (d === 'advance') {
+    label.textContent = '✓ ADVANCE TO PORTFOLIO REVIEW';
+    detail.textContent = `${passes} passes · ${fails} fails · ${nnFails} non-neg fails`;
+  } else if (d === 'borderline') {
+    label.textContent = '⚠ BORDERLINE — SECOND OPINION REQUIRED';
+    detail.textContent = `${passes} passes · ${fails} fails · ${nnFails} non-neg fails`;
+  } else if (d === 'decline') {
+    label.textContent = nnFails > 0 ? `✕ DECLINE — Non-negotiable fail (Q${QUESTIONS.filter(q=>q.nn&&s.scores?.[q.id]==='fail').map(q=>q.id.replace('q','')).join(', Q')})` : '✕ DECLINE';
+    detail.textContent = `${passes} passes · ${fails} fails`;
+  }
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  currentId = null;
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('modal')) closeModal();
+}
+
+async function saveCandidate() {
+  if (!currentId) return;
+  if (!state[currentId]) state[currentId] = { status:'Not Contacted', scores:{}, notes:{} };
+  state[currentId].status = document.getElementById('modal-status-select').value;
+  QUESTIONS.forEach(q => {
+    const noteEl = document.getElementById('note-' + q.id);
+    if (noteEl) state[currentId].notes[q.id] = noteEl.value;
+  });
+  state[currentId].decision = calcDecision(currentId);
+  await saveState();
+  closeModal();
+  renderPipeline();
+  renderDashboard();
+  showToast('Saved ✓');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+loadState().then(() => {
+  renderDashboard();
+  renderPipeline();
+});
+</script>
+</body>
+</html>
