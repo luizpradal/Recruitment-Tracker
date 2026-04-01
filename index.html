@@ -344,15 +344,14 @@ const CANDIDATES = [
   {id:6,  rank:6,  name:'Ganso Galvão',     handle:'@gansogalvao',          exp:20, english:'Not stated',        score:78.5, band:'STRONG',   email:'gansogalvaoart@gmail.com',      contact:'@gansogalvao'},
   {id:7,  rank:7,  name:'Mario Art',        handle:'@marioart_tattoo',      exp:25, english:'Not stated',        score:77.5, band:'STRONG',   email:'via Instagram DM',              contact:'@marioart_tattoo'},
   {id:8,  rank:8,  name:'Renato Kiss',      handle:'@renatokisstattoo',     exp:12, english:'Not stated',        score:76.5, band:'STRONG',   email:'via Instagram DM',              contact:'@renatokisstattoo'},
-  {id:9,  rank:9,  name:'Ramon Rodrigo',    handle:'@ramonrodrigoo',        exp:11, english:'Not stated',        score:75.0, band:'STRONG',   email:'via Instagram DM',              contact:'@ramonrodrigoo'},
-  {id:10, rank:10, name:'Ddierre Botelho',  handle:'@ddierretattoo',        exp:10, english:'Not stated',        score:72.0, band:'STRONG',   email:'via Instagram DM',              contact:'@ddierretattoo'},
-  {id:11, rank:11, name:'Felipe Matias',    handle:'@felpmatiastattoo',     exp:7,  english:'Yes',               score:69.5, band:'POSSIBLE', email:'fmatiassoares@gmail.com',       contact:'+5512981607519'},
-  {id:12, rank:12, name:'Matheus Scalon',   handle:'@matheusscalontattoo',  exp:11, english:'Needs to improve',  score:69.5, band:'POSSIBLE', email:'matheusscalon87@gmail.com',     contact:'+5511971754428'},
-  {id:13, rank:13, name:'Samuel Ramalho',   handle:'@samuelramalhotattoos', exp:10, english:'A little',          score:68.5, band:'POSSIBLE', email:'samuelhramalho@gmail.com',      contact:'+5531989543687'},
+  {id:9,  rank:9,  name:'Ddierre Botelho',  handle:'@ddierretattoo',        exp:10, english:'Not stated',        score:72.0, band:'STRONG',   email:'via Instagram DM',              contact:'@ddierretattoo'},
+  {id:10, rank:10, name:'Felipe Matias',    handle:'@felpmatiastattoo',     exp:7,  english:'Yes',               score:69.5, band:'POSSIBLE', email:'fmatiassoares@gmail.com',       contact:'+5512981607519'},
+  {id:11, rank:11, name:'Matheus Scalon',   handle:'@matheusscalontattoo',  exp:11, english:'Needs to improve',  score:69.5, band:'POSSIBLE', email:'matheusscalon87@gmail.com',     contact:'+5511971754428'},
+  {id:12, rank:12, name:'Samuel Ramalho',   handle:'@samuelramalhotattoos', exp:10, english:'A little',          score:68.5, band:'POSSIBLE', email:'samuelhramalho@gmail.com',      contact:'+5531989543687'},
 ];
 
 const FIREBASE_URL = 'https://nr-designer-recruitment-default-rtdb.firebaseio.com';
-const BUILD_TS = '2026-03-31T18:00:00Z';
+const BUILD_TS = '2026-03-31T19:00:00Z';
 
 // Clear stale recruiter name when build changes
 (function() {
@@ -502,7 +501,7 @@ function showView(v, btn) {
 
 // ── DASHBOARD ──────────────────────────────────────────────────────────────
 function renderDashboard() {
-  const counts = { total:13, contacted:0, interviewed:0, advanced:0, declined:0, borderline:0, scheduled:0 };
+  const counts = { total:12, contacted:0, interviewed:0, advanced:0, declined:0, borderline:0, scheduled:0 };
   CANDIDATES.forEach(c => {
     const s = state[String(c.id)]?.status || 'Not Contacted';
     if (s !== 'Not Contacted') counts.contacted++;
